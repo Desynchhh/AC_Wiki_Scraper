@@ -32,7 +32,7 @@ def scrape_fish():
 
         if curr_col == 0:               # Name
             # print(curr_col, fish)
-            name = fish.a.text.strip()
+            name = fish.a.text.strip().lower().replace(' ', '').replace('-','')
             fishes[name] = {}
             details_uri = fish.a['href']
             fishes[name]['details_link'] = base_url + details_uri
@@ -91,5 +91,5 @@ def scrape_bugs():
     pass
 
 if __name__ == '__main__':
-    # scrape_fish()
-    scrape_bugs()
+    scrape_fish()
+    # scrape_bugs()
