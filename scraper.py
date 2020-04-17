@@ -17,10 +17,10 @@ def scrape_fish():
 
     # Get the columns and names in the tables
     table_cols = [col.text.strip() for col in n_table.find_all('th')]
-    MONTHS = tuple(table_cols[6:])
+    months = tuple(table_cols[6:])
 
     # Constant number of rows in the tables
-    ROWS = len(table_cols)
+    rows = len(table_cols)
     
     # Init dict
     fishes={}
@@ -28,68 +28,141 @@ def scrape_fish():
     base_url = 'https://animalcrossing.fandom.com'
 
     for i, fish in enumerate(n_table.find_all('td')):
-        curr_col = i%ROWS
+        curr_col = i%rows
 
         if curr_col == 0:               # Name
-            # print(curr_col, fish)
             name = fish.a.text.strip().lower().replace(' ', '').replace('-','')
-            fishes[name] = {}
             details_uri = fish.a['href']
-            fishes[name]['details_link'] = base_url + details_uri
-            
+            fishes[name] = {'details_link': base_url + details_uri}
         elif curr_col == 1:             # Image
-            # print(curr_col, fish)
             img_link = fish.a['href']
             fishes[name]['image'] = img_link
 
         elif curr_col == 2:             # Price
-            # print(curr_col, fish)
             price = int(fish.text.strip())
             fishes[name]['nook_price'] = price
             fishes[name]['cj_price'] = int(price*1.5)
 
         elif curr_col == 3:             # Location
-            # print(curr_col, fish)
             location = fish.text.strip()
             fishes[name]['location'] = location
 
         elif curr_col == 4:             # Shadow size
-            # print(curr_col, fish)
             shadow = fish.text.strip()
             fishes[name]['shadow_size'] = shadow
 
         elif curr_col == 5:             # Time
-            # print(curr_col, fish)
             time = fish.small.text.strip()
             fishes[name]['active_hours'] = time
+
+        elif curr_col == 6:             # Months
+            # Prep dict with arrays for both hemispheres
             fishes[name]['months_available'] = {'northern': [], 'southern': []}
             fishes[name]['months_unavailable'] = {'northern': [], 'southern': []}
 
-        elif curr_col == 6:             # Months
-            n_fish_months = n_table.find_all('td')[i:i+11]
-            s_fish_months = s_table.find_all('td')[i:i+11]
+            # Handle all months in one loop iterations (with nested loops)
+            n_months = n_table.find_all('td')[i:i+12]
+            s_months = s_table.find_all('td')[i:i+12]
             
             # Northern Hemisphere
-            for x, month in enumerate(n_fish_months):
+            for x, month in enumerate(n_months):
                 if month.text.strip() == '-':
-                    fishes[name]['months_unavailable']['northern'].append(MONTHS[x])
+                    fishes[name]['months_unavailable']['northern'].append(months[x])
                 else:
-                    fishes[name]['months_available']['northern'].append(MONTHS[x])
+                    fishes[name]['months_available']['northern'].append(months[x])
             
             # Southern Hemisphere
-            for x, month in enumerate(s_fish_months):
+            for x, month in enumerate(s_months):
                 if month.text.strip() == '-':
-                    fishes[name]['months_unavailable']['southern'].append(MONTHS[x])
+                    fishes[name]['months_unavailable']['southern'].append(months[x])
                 else:
-                    fishes[name]['months_available']['southern'].append(MONTHS[x])
-        else:
-            pass
+                    fishes[name]['months_available']['southern'].append(months[x])
+
     with open('json/fish.json', 'w') as f:
         json.dump(fishes, f)
+    print('Scraped fish.')
+
 
 def scrape_bugs():
-    pass
+    # Get data from wiki
+    source = requests.get('https://animalcrossing.fandom.com/wiki/Bugs_(New_Horizons)').text
+    soup = BeautifulSoup(source, 'lxml')
+    
+    # Get table divs for ease of access
+    n_table_div = soup.find(title="Northern Hemisphere")
+    s_table_div = soup.find(title="Southern Hemisphere")
 
-if __name__ == '__main__':
+    # Get tables for even more ease of access
+    n_table = n_table_div.table.table
+    s_table = s_table_div.table.table
+
+    # Table header names
+    table_cols = [col.text.strip() for col in n_table.find_all('th')]
+    
+    months = table_cols[5:]
+    rows = len(table_cols)
+
+    # Init dict
+    bugs={}
+
+    base_url = 'https://animalcrossing.fandom.com'
+
+    for i, bug in enumerate(n_table.find_all('td')):
+        curr_col = i%rows
+        
+        if curr_col == 0:               # Name
+            name = bug.a.text.strip().lower().replace(' ', '').replace('-','')
+            details_uri = bug.a['href']
+            bugs[name] = { 'details_link': base_url + details_uri }
+        
+        elif curr_col == 1:             # Image
+            img_link = bug.a['href']
+            bugs[name]['image'] = img_link
+        
+        elif curr_col == 2:             # Price
+            price = int(bug.text.strip())
+            bugs[name]['nook_price'] = price
+            bugs[name]['flick_price'] = int(price*1.5)
+       
+        elif curr_col == 3:             # Location
+            location = bug.text.strip()
+            bugs[name]['location'] = location
+        
+        elif curr_col == 4:             # Time
+            time = bug.small.text.strip()
+            bugs[name]['active_hours'] = time
+       
+        elif curr_col == 5:             # Months
+            # Prep dict with arrays for both hemispheres
+            bugs[name]['months_available'] = { 'northern': [], 'southern': [] }
+            bugs[name]['months_unavailable'] = { 'northern': [], 'southern': [] }
+
+            # Handle all months in one loop iteration
+            n_months = n_table.find_all('td')[i:i+12]
+            s_months = s_table.find_all('td')[i:i+12]
+
+            # Northern Hemisphere
+            for x, month in enumerate(n_months):
+                if month.text.strip() == '-':
+                    bugs[name]['months_unavailable']['northern'].append(months[x])
+                else:
+                    bugs[name]['months_available']['northern'].append(months[x])
+
+            for x, month in enumerate(s_months):
+                if month.text.strip() == '-':
+                    bugs[name]['months_unavailable']['southern'].append(months[x])
+                else:
+                    bugs[name]['months_available']['southern'].append(months[x])
+
+    with open('json/bugs.json', 'w') as f:
+        json.dump(bugs, f)
+    print('Scraped bugs.')
+
+
+
+def run_scraper():
     scrape_fish()
-    # scrape_bugs()
+    scrape_bugs()
+
+
+run_scraper()
