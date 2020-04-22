@@ -80,7 +80,6 @@ def scrape_fish():
 
     with open('json/fish.json', 'w') as f:
         json.dump(fishes, f)
-    print('Scraped fish.')
 
 
 def scrape_bugs():
@@ -156,13 +155,9 @@ def scrape_bugs():
 
     with open('json/bugs.json', 'w') as f:
         json.dump(bugs, f)
-    print('Scraped bugs.')
 
 
 
 def run_scraper():
     scrape_fish()
     scrape_bugs()
-
-
-run_scraper()
