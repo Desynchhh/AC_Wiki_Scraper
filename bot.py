@@ -25,6 +25,7 @@ def get_prefix(bot, message):
 
 # Set a prefix for bot commands
 bot = commands.Bot(command_prefix=get_prefix, owner_id=228179496807694336)
+bot.remove_command('help')
 
 
 @bot.event
