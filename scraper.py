@@ -31,34 +31,35 @@ def scrape_fish():
         curr_col = i%rows
 
         if curr_col == 0:               # Name
-            name = fish.a.text.strip().lower().replace(' ', '').replace('-','')
+            name = fish.a.text.strip()
+            cur_fish = name.lower().replace(' ', '').replace('-','')
             details_uri = fish.a['href']
-            fishes[name] = {'details_link': base_url + details_uri}
+            fishes[cur_fish] = {'name': name, 'details_link': base_url + details_uri}
         elif curr_col == 1:             # Image
             img_link = fish.a['href']
-            fishes[name]['image'] = img_link
+            fishes[cur_fish]['image'] = img_link
 
         elif curr_col == 2:             # Price
             price = int(fish.text.strip())
-            fishes[name]['nook_price'] = price
-            fishes[name]['cj_price'] = int(price*1.5)
+            fishes[cur_fish]['nook_price'] = price
+            fishes[cur_fish]['cj_price'] = int(price*1.5)
 
         elif curr_col == 3:             # Location
             location = fish.text.strip()
-            fishes[name]['location'] = location
+            fishes[cur_fish]['location'] = location
 
         elif curr_col == 4:             # Shadow size
             shadow = fish.text.strip()
-            fishes[name]['shadow_size'] = shadow
+            fishes[cur_fish]['shadow_size'] = shadow
 
         elif curr_col == 5:             # Time
             time = fish.small.text.strip()
-            fishes[name]['active_hours'] = time
+            fishes[cur_fish]['active_hours'] = time
 
         elif curr_col == 6:             # Months
             # Prep dict with arrays for both hemispheres
-            fishes[name]['months_available'] = {'northern': [], 'southern': []}
-            fishes[name]['months_unavailable'] = {'northern': [], 'southern': []}
+            fishes[cur_fish]['months_available'] = {'northern': [], 'southern': []}
+            fishes[cur_fish]['months_unavailable'] = {'northern': [], 'southern': []}
 
             # Handle all months in one loop iterations (with nested loops)
             n_months = n_table.find_all('td')[i:i+12]
@@ -67,16 +68,16 @@ def scrape_fish():
             # Northern Hemisphere
             for x, month in enumerate(n_months):
                 if month.text.strip() == '-':
-                    fishes[name]['months_unavailable']['northern'].append(months[x])
+                    fishes[cur_fish]['months_unavailable']['northern'].append(months[x])
                 else:
-                    fishes[name]['months_available']['northern'].append(months[x])
+                    fishes[cur_fish]['months_available']['northern'].append(months[x])
             
             # Southern Hemisphere
             for x, month in enumerate(s_months):
                 if month.text.strip() == '-':
-                    fishes[name]['months_unavailable']['southern'].append(months[x])
+                    fishes[cur_fish]['months_unavailable']['southern'].append(months[x])
                 else:
-                    fishes[name]['months_available']['southern'].append(months[x])
+                    fishes[cur_fish]['months_available']['southern'].append(months[x])
 
     with open('json/fish.json', 'w') as f:
         json.dump(fishes, f)
@@ -110,31 +111,32 @@ def scrape_bugs():
         curr_col = i%rows
         
         if curr_col == 0:               # Name
-            name = bug.a.text.strip().lower().replace(' ', '').replace('-','')
+            name = bug.a.text.strip()
+            cur_bug = name.lower().replace(' ', '').replace('-','')
             details_uri = bug.a['href']
-            bugs[name] = { 'details_link': base_url + details_uri }
+            bugs[cur_bug] = {'name': name, 'details_link': base_url + details_uri }
         
         elif curr_col == 1:             # Image
             img_link = bug.a['href']
-            bugs[name]['image'] = img_link
+            bugs[cur_bug]['image'] = img_link
         
         elif curr_col == 2:             # Price
             price = int(bug.text.strip())
-            bugs[name]['nook_price'] = price
-            bugs[name]['flick_price'] = int(price*1.5)
+            bugs[cur_bug]['nook_price'] = price
+            bugs[cur_bug]['flick_price'] = int(price*1.5)
        
         elif curr_col == 3:             # Location
             location = bug.text.strip()
-            bugs[name]['location'] = location
+            bugs[cur_bug]['location'] = location
         
         elif curr_col == 4:             # Time
             time = bug.small.text.strip()
-            bugs[name]['active_hours'] = time
+            bugs[cur_bug]['active_hours'] = time
        
         elif curr_col == 5:             # Months
             # Prep dict with arrays for both hemispheres
-            bugs[name]['months_available'] = { 'northern': [], 'southern': [] }
-            bugs[name]['months_unavailable'] = { 'northern': [], 'southern': [] }
+            bugs[cur_bug]['months_available'] = { 'northern': [], 'southern': [] }
+            bugs[cur_bug]['months_unavailable'] = { 'northern': [], 'southern': [] }
 
             # Handle all months in one loop iteration
             n_months = n_table.find_all('td')[i:i+12]
@@ -143,15 +145,15 @@ def scrape_bugs():
             # Northern Hemisphere
             for x, month in enumerate(n_months):
                 if month.text.strip() == '-':
-                    bugs[name]['months_unavailable']['northern'].append(months[x])
+                    bugs[cur_bug]['months_unavailable']['northern'].append(months[x])
                 else:
-                    bugs[name]['months_available']['northern'].append(months[x])
+                    bugs[cur_bug]['months_available']['northern'].append(months[x])
 
             for x, month in enumerate(s_months):
                 if month.text.strip() == '-':
-                    bugs[name]['months_unavailable']['southern'].append(months[x])
+                    bugs[cur_bug]['months_unavailable']['southern'].append(months[x])
                 else:
-                    bugs[name]['months_available']['southern'].append(months[x])
+                    bugs[cur_bug]['months_available']['southern'].append(months[x])
 
     with open('json/bugs.json', 'w') as f:
         json.dump(bugs, f)
