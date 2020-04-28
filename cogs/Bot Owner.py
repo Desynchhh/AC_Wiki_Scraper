@@ -5,8 +5,8 @@ from helpers.checks import is_bot_owner
 from scraper import run_scraper
 
 class BotOwner(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
     
 
     @commands.command()
@@ -14,11 +14,7 @@ class BotOwner(commands.Cog):
     async def updatejson(self, ctx):
         run_scraper()
         await ctx.send('Updated JSON data')
-    
-    @updatejson.error
-    async def updatejson_error(self, ctx, error):
-        await ctx.send('Oops! Looks like only the bot owner can run this command.')
 
 
-def setup(client):
-    client.add_cog(BotOwner(client))
+def setup(bot):
+    bot.add_cog(BotOwner(bot))

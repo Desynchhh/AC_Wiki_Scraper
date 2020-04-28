@@ -4,10 +4,11 @@ from discord.ext import commands
 import json
 
 from helpers.jsonreader import get_critter, get_monthly_critters
+from helpers.serversettings import load_serversettings
 
 class Critterpedia(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
         
 
     @commands.command()
@@ -101,8 +102,7 @@ More details at {bug['details_link']}"""
     
 
     def __get_default_hemisphere(ctx):
-        with open('serversettings.json', 'r') as f:
-            serversettings = json.load(f)
+        serversettings = load_serversettings()
         
         guild_id = str(ctx.guild.id)
         if guild_id not in serversettings or serversettings[guild_id]['hemisphere'] is None:
@@ -110,5 +110,5 @@ More details at {bug['details_link']}"""
         return serversettings[guild_id]['hemisphere']
 
 
-def setup(client):
-    client.add_cog(Critterpedia(client))
+def setup(bot):
+    bot.add_cog(Critterpedia(bot))

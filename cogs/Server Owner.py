@@ -4,20 +4,18 @@ from discord.ext import commands
 import json
 
 from helpers.checks import is_owner
-
-serversettings_path = 'serversettings.json'
+from helpers.serversettings import load_serversettings, update_serversettings
 
 class ServerOwner(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
     
     @commands.command()
     @commands.check(is_owner)
     async def setprefix(self, ctx, *, prefix):
         """Set a custom prefix for the bot on this server.
         Example: >sethemisphere !"""
-        with open(serversettings_path, 'r') as f:
-            serversettings = json.load(f)
+        serversettings = load_serversettings()
         
         guild_id = str(ctx.guild.id)
         if guild_id in serversettings:
@@ -25,8 +23,7 @@ class ServerOwner(commands.Cog):
         else:
             serversettings[guild_id] = {'prefix': prefix}
 
-        with open(serversettings_path, 'w') as f:
-            json.dump(serversettings, f)
+        update_serversettings(serversettings)
         
         await ctx.send(f'New prefix is `{prefix}`')
 
@@ -39,8 +36,7 @@ class ServerOwner(commands.Cog):
         Example: >sethemisphere northern"""
         hemisphere = hemisphere.lower()
         if hemisphere == 'northern' or hemisphere == 'southern':
-            with open(serversettings_path, 'r') as f:
-                serversettings = json.load(f)
+            serversettings = load_serversettings()
             
             guild_id = str(ctx.guild.id)
             if guild_id in serversettings:
@@ -48,8 +44,7 @@ class ServerOwner(commands.Cog):
             else:
                 serversettings[guild_id] = {"hemisphere": hemisphere}
             
-            with open(serversettings_path, 'w') as f:
-                json.dump(serversettings, f)
+            update_serversettings(serversettings)
             
             await ctx.send(f'The default hemisphere is now `{hemisphere}`')
         
@@ -57,5 +52,5 @@ class ServerOwner(commands.Cog):
             await ctx.send("You can only set the hemisphere to either northern or southern!")
 
 
-def setup(client):
-    client.add_cog(ServerOwner(client))
+def setup(bot):
+    bot.add_cog(ServerOwner(bot))

@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 import os, json
 
+from helpers.serversettings import load_serversettings
+
 # Load .env file
 load_dotenv()
 
@@ -12,8 +14,7 @@ def get_prefix(bot, message):
     if not message.guild:
         return commands.when_mentioned_or('>')(bot, message)
     
-    with open('serversettings.json', 'r') as f:
-        serversettings = json.load(f)
+    serversettings = load_serversettings()
 
     guild_id = str(message.guild.id)    
     if guild_id not in serversettings or 'prefix' not in serversettings[guild_id]:
