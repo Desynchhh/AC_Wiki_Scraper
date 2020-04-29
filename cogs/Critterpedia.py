@@ -56,7 +56,7 @@ More details at {bug['details_link']}"""
             hemisphere = Critterpedia.__get_default_hemisphere(ctx)
         critters = get_monthly_critters(critter_type, hemisphere)
         
-        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
         e.add_field(
             name=f'{critter_type.capitalize()} that have stayed since {critters["prev_month"]}', 
             value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
@@ -64,10 +64,17 @@ More details at {bug['details_link']}"""
         )
 
         e.add_field(
-            name=f'{critter_type.capitalize()} that are new for {critters["month"]}!',
+            name=f'{critter_type.capitalize()} that are new for {critters["this_month"]}!',
             value=", ".join([critter['name'] for critter in critters['new_critters']]),
             inline=False
         )
+
+        e.add_field(
+            name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
+            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            inline=False
+        )
+
         await ctx.send(embed=e)
     
 
@@ -77,7 +84,7 @@ More details at {bug['details_link']}"""
             hemisphere = Critterpedia.__get_default_hemisphere(ctx)
         critters = get_monthly_critters(critter_type, hemisphere, 0)
         
-        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
         e.add_field(
             name=f'{critter_type.capitalize()} that will stay after {critters["prev_month"]}', 
             value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
@@ -85,10 +92,17 @@ More details at {bug['details_link']}"""
         )
 
         e.add_field(
-            name=f'{critter_type.capitalize()} that will be new for {critters["month"]}!',
+            name=f'{critter_type.capitalize()} that will be new for {critters["this_month"]}!',
             value=", ".join([critter['name'] for critter in critters['new_critters']]),
             inline=False
         )
+        
+        e.add_field(
+            name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
+            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            inline=False
+        )
+
         await ctx.send(embed=e)
     
 
@@ -98,7 +112,7 @@ More details at {bug['details_link']}"""
             hemisphere = Critterpedia.__get_default_hemisphere(ctx)
         critters = get_monthly_critters(critter_type, hemisphere, -2)
         
-        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
         e.add_field(
             name=f'{critter_type.capitalize()} that were active since {critters["prev_month"]}', 
             value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
@@ -106,10 +120,17 @@ More details at {bug['details_link']}"""
         )
 
         e.add_field(
-            name=f'{critter_type.capitalize()} that were new to {critters["month"]}!',
+            name=f'{critter_type.capitalize()} that were new to {critters["this_month"]}!',
             value=", ".join([critter['name'] for critter in critters['new_critters']]),
             inline=False
         )
+        
+        e.add_field(
+            name=f'{critter_type.capitalize()} that left in {critters["next_month"]}',
+            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            inline=False
+        )
+        
         await ctx.send(embed=e)
 
 
