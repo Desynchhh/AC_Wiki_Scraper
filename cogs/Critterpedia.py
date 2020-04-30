@@ -79,6 +79,8 @@ More details at {bug['details_link']}"""
         if critter_type in self.valid_critter_types:
             if hemisphere is None:
                 hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
+            else:
+                hemisphere = self._verify_hemisphere(hemisphere)
             critters = get_monthly_critters(critter_type, hemisphere, -2)
             
             e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
@@ -116,6 +118,8 @@ More details at {bug['details_link']}"""
         if critter_type in self.valid_critter_types:
             if hemisphere is None:
                 hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
+            else:
+                hemisphere = self._verify_hemisphere(hemisphere)
             critters = get_monthly_critters(critter_type, hemisphere)
             
             e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
@@ -153,6 +157,8 @@ More details at {bug['details_link']}"""
         if critter_type in self.valid_critter_types:
             if hemisphere is None:
                 hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
+            else:
+                hemisphere = self._verify_hemisphere(hemisphere)
             critters = get_monthly_critters(critter_type, hemisphere, 0)
             
             e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
@@ -192,9 +198,24 @@ More details at {bug['details_link']}"""
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'WrongCritterType':
                 await ctx.send("I'm afraid I don't know what type of critter you are looking for. I only know about bugs and fish hoo..")
-        
+
+            elif error.original.args[0] == 'HemisphereDoesNotExist':
+                await ctx.send(f"I'm afraid {error.original.args[1]} is not an existing hemisphere. You can only choose between northern and southern.")
         else:
             await ctx.send(self.default_error_msg)
+
+
+    def _verify_hemisphere(self, hemisphere:str):
+        valid_hemispheres = Serversettings().get_valid_hemispheres()
+        if hemisphere in valid_hemispheres['northern'] or hemisphere in valid_hemispheres['southern']:
+            for hs in valid_hemispheres:
+                if hemisphere in hs:
+                    hemisphere = hs
+                    break
+            return hemisphere
+        else:
+            raise Exception('HemisphereDoesNotExist', hemisphere)
+
 
 
 def setup(bot):

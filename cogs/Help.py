@@ -37,7 +37,7 @@ class Help(commands.Cog):
             await ctx.send(embed=e)
     
 
-    @help.command()
+    @help.command(aliases=['f'])
     async def fish(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
@@ -45,14 +45,14 @@ class Help(commands.Cog):
         e.add_field(name=f'Shows information on the given fish.', value=
             "You need to type the fish's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
             "**name**: Name of the fish you wish to know about.\n"
-            f"**Example**: {prefix}fish pop-eyed goldfish"
+            f"**Example**: {prefix}fish pop-eyed goldfish\n"
             "**Aliases**: fish, f",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
     
-    @help.command()
+    @help.command(aliases=['b'])
     async def bug(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
@@ -60,14 +60,14 @@ class Help(commands.Cog):
         e.add_field(name='Shows information on a specified bug.', value=
             "You need to type the bug's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
             "**name**: Name of the bug you wish to know about.\n"
-            f"**Example**: {prefix}bug common butterfly"
+            f"**Example**: {prefix}bug common butterfly\n"
             "**Aliases**: bug, b",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
 
-    @help.command()
+    @help.command(aliases=['pm'])
     async def prevmonth(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
@@ -75,14 +75,14 @@ class Help(commands.Cog):
         e.add_field(name='Shows all critters you could catch last month.',value=
             "**critter type**: The type of critter you wish you could have caught (fish or bugs).\n"
             "**hemisphere**: You can choose either the northern or southern hemisphere for this command.\n"
-            f"**Example**: {prefix}prevmonth fish southern"
+            f"**Example**: {prefix}prevmonth fish southern\n"
             "**Aliases**: prevmonth, pm",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
 
-    @help.command()
+    @help.command(aliases=['tm'])
     async def thismonth(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
@@ -90,14 +90,14 @@ class Help(commands.Cog):
         e.add_field(name='Shows all critters you can catch this month.',value=
             "**critter type**: The type of critter you want to catch (fish or bugs).\n"
             "**hemisphere**: You can choose either the northern or southern hemisphere for this command.\n"
-            f"**Example**: {prefix}thismonth bugs southern"
+            f"**Example**: {prefix}thismonth bugs southern\n"
             "**Aliases**: thismonth, tm",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
 
-    @help.command()
+    @help.command(aliases=['nm'])
     async def nextmonth(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
@@ -105,14 +105,14 @@ class Help(commands.Cog):
         e.add_field(name='Shows all critters you can catch next month.',value=
             "**critter type**: The type of critter you want to catch (fish or bugs).\n"
             "**hemisphere**: You can choose either the northern or southern hemisphere for this command.\n"
-            f"**Example**: {prefix}nextmonth bugs northern"
+            f"**Example**: {prefix}nextmonth bugs northern\n"
             "**Aliases**: nextmonth, nm",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
 
-    @help.command()
+    @help.command(aliases=['setp'])
     @commands.check(is_owner)
     async def setprefix(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
@@ -120,14 +120,14 @@ class Help(commands.Cog):
         e = discord.Embed(title=f'**{prefix}setprefix <new prefix>**', colour=self.embed_colour)
         e.add_field(name='Sets a custom prefix for this bot on your server.',value=
             "**new prefix**: The prefix you want to use for this bot on this server.\n"
-            f"**Example**: {prefix}setprefix !"
+            f"**Example**: {prefix}setprefix !\n"
             "**Aliases**: setprefix, setp",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
 
-    @help.command()
+    @help.command(aliases=['seth'])
     @commands.check(is_owner)
     async def sethemisphere(self, ctx):
         prefix = Serversettings().get_prefix(ctx.guild.id)
@@ -135,7 +135,7 @@ class Help(commands.Cog):
         e = discord.Embed(title=f'**{prefix}sethemisphere <hemisphere>**', colour=self.embed_colour)
         e.add_field(name='Sets the default hemisphere for your server when running commands.',value=
             "**hemisphere**: The main hemisphere you want to be used on this server (has to be either 'northern' or 'southern').\n"
-            f"**Example**: {prefix}sethemisphere northern"
+            f"**Example**: {prefix}sethemisphere northern\n"
             "**Aliases**: sethemisphere, seth",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)

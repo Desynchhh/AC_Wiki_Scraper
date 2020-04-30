@@ -29,13 +29,19 @@ class ServerOwner(commands.Cog):
     async def setprefix_error(self, ctx, error):
         if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
             await ctx.send("You have to specify a new prefix to use for your server.")
+        elif isinstance(error, discord.ext.commands.errors.CheckFailure):
+            await ctx.send("Only the server owner can use that command.")
 
 
     @commands.command(aliases=['seth'])
     @commands.check(is_owner)
     async def sethemisphere(self, ctx, hemisphere:str):
         hemisphere = hemisphere.lower()
-        if hemisphere == 'northern' or hemisphere == 'southern':
+        valid_hemispheres = Serversettings().get_valid_hemispheres()
+        if hemisphere in valid_hemispheres['northern'] or hemisphere in valid_hemispheres['southern']:
+            for hs in valid_hemispheres:
+                if hemisphere in hs:
+                    hemisphere = hs
             serversettings = Serversettings().load()
             
             guild_id = str(ctx.guild.id)
@@ -55,7 +61,10 @@ class ServerOwner(commands.Cog):
     async def sethemisphere_error(self, ctx, error):
         if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
             await ctx.send('You have to specify a hemisphere to use as the default hemisphere for your server.')
-        
+
+        elif isinstance(error, discord.ext.commands.errors.CheckFailure):
+            await ctx.send("Only the server owner can use that command.")
+
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'HemisphereDoesNotExist':
                 await ctx.send('The hemisphere you have chosen does not exist. You can only choose between northern and southern.')

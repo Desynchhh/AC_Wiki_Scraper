@@ -1,1 +1,1 @@
-{"700246545886609448": {"hemisphere": "northern", "prefix": ">"}}
+{"valid_hemispheres": {"northern": ["northern", "north", "nor", "n"], "southern": ["southern", "south", "sou", "s"]}, "servers": {"700246545886609448": {"hemisphere": "northern", "prefix": ">"}}}
