@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
-import requests
-import json
+import requests, json, os
 
 def scrape_fish():
     # Get source data
@@ -32,9 +31,10 @@ def scrape_fish():
 
         if curr_col == 0:               # Name
             name = fish.a.text.strip()
-            cur_fish = name.lower().replace(' ', '').replace('-','')
+            cur_fish = name.lower()
             details_uri = fish.a['href']
             fishes[cur_fish] = {'name': name, 'details_link': base_url + details_uri}
+        
         elif curr_col == 1:             # Image
             img_link = fish.a['href']
             fishes[cur_fish]['image'] = img_link
@@ -112,7 +112,7 @@ def scrape_bugs():
         
         if curr_col == 0:               # Name
             name = bug.a.text.strip()
-            cur_bug = name.lower().replace(' ', '').replace('-','')
+            cur_bug = name.lower()
             details_uri = bug.a['href']
             bugs[cur_bug] = {'name': name, 'details_link': base_url + details_uri }
         
@@ -161,5 +161,7 @@ def scrape_bugs():
 
 
 def run_scraper():
+    if not os.path.exists('./json'):
+        os.mkdir('json')
     scrape_fish()
     scrape_bugs()

@@ -1,30 +1,34 @@
 import json
 
-SERVERSETTINGS_PATH = 'serversettings.json'
 
-def load_serversettings():
-    with open(SERVERSETTINGS_PATH, 'r') as f:
-        return json.load(f)
-
-
-def update_serversettings(serversettings:dict):
-    with open(SERVERSETTINGS_PATH, 'w') as f:
-        json.dump(serversettings, f)
+class Serversettings():
+    def __init__(self):
+        self.SERVERSETTINGS_PATH = 'serversettings.json'
 
 
-def get_prefix(ctx):
-    serversettings = load_serversettings()
-    guild_id = str(ctx.guild.id)
-    if guild_id in serversettings and 'prefix' in serversettings[guild_id]:
-        return serversettings[guild_id]['prefix']
-    else:
-        return '>'
+    def load(self):
+        with open(self.SERVERSETTINGS_PATH, 'r') as f:
+            return json.load(f)
 
 
-def get_hemisphere(ctx):
-    serversettings = load_serversettings()
-    guild_id = str(ctx.guild.id)
-    if guild_id in serversettings and 'hemisphere' in serversettings[guild_id]:
-        return serversettings[guild_id]['hemisphere']
-    else:
-        return 'northern'
+    def update(self, serversettings:dict):
+        with open(self.SERVERSETTINGS_PATH, 'w') as f:
+            json.dump(serversettings, f)
+
+
+    def get_prefix(self, guild_id):
+        serversettings = self.load()
+        guild_id = str(guild_id)
+        if guild_id in serversettings and 'prefix' in serversettings[guild_id]:
+            return serversettings[guild_id]['prefix']
+        else:
+            return '>'
+
+
+    def get_hemisphere(self, guild_id):
+        serversettings = self.load()
+        guild_id = str(guild_id)
+        if guild_id in serversettings and 'hemisphere' in serversettings[guild_id]:
+            return serversettings[guild_id]['hemisphere']
+        else:
+            return 'northern'

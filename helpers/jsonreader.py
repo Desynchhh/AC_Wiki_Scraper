@@ -4,8 +4,8 @@ from datetime import datetime
 FILEPATH = 'json/'
 MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
-def get_critter(filename:str, critter_name:str, hemisphere:str):
-    critter_name = critter_name.strip().lower().replace(' ','').replace('-','')
+def get_critter(filename:str, critter_name:str):
+    critter_name = critter_name.strip().lower()
     with open(f'{FILEPATH}/{filename}.json', 'r') as f:
         data = json.load(f)
     if critter_name in data:

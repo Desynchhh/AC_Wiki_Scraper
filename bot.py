@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 
 import os, json
 
-from helpers.serversettings import load_serversettings
+from helpers.serversettings import Serversettings
+
 
 # Load .env file
 load_dotenv()
@@ -14,7 +15,7 @@ def get_prefix(bot, message):
     if not message.guild:
         return commands.when_mentioned_or('>')(bot, message)
     
-    serversettings = load_serversettings()
+    serversettings = Serversettings().load()
 
     guild_id = str(message.guild.id)    
     if guild_id not in serversettings or 'prefix' not in serversettings[guild_id]:
@@ -32,6 +33,12 @@ bot.remove_command('help')
 @bot.event
 async def on_ready():
     print('Blathers, ready for action!')
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, discord.ext.commands.errors.CommandNotFound):
+        await ctx.send("I'm afraid that command does not exist.")
 
 
 # Load all cogs
