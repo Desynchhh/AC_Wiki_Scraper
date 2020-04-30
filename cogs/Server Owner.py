@@ -10,7 +10,7 @@ class ServerOwner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command()
+    @commands.command(aliases=['setp'])
     @commands.check(is_owner)
     async def setprefix(self, ctx, *, prefix):
         serversettings = Serversettings().load()
@@ -31,7 +31,7 @@ class ServerOwner(commands.Cog):
             await ctx.send("You have to specify a new prefix to use for your server.")
 
 
-    @commands.command()
+    @commands.command(aliases=['seth'])
     @commands.check(is_owner)
     async def sethemisphere(self, ctx, hemisphere:str):
         hemisphere = hemisphere.lower()

@@ -7,7 +7,7 @@ from scraper import run_scraper
 class BotOwner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
 
     @commands.command()
     @commands.check(is_bot_owner)

@@ -12,7 +12,7 @@ class Critterpedia(commands.Cog):
         self.default_error_msg = "I am sorry, but something went wrong. I am uncertain whether it was something you did, or something I did hoo.."
         self.valid_critter_types = ['fish', 'bugs']
 
-    @commands.command()
+    @commands.command(aliases=['f'])
     async def fish(self, ctx, *, name:str):
         fish = get_critter('fish', name)
         if fish is None:
@@ -43,7 +43,7 @@ More details at {fish['details_link']}"""
             await ctx.send(self.default_error_msg)
 
 
-    @commands.command()
+    @commands.command(aliases=['b'])
     async def bug(self, ctx, *, name:str):
         bug = get_critter('bugs', name)
         if bug is None:
@@ -74,7 +74,7 @@ More details at {bug['details_link']}"""
 
 
 
-    @commands.command()
+    @commands.command(aliases=['pm'])
     async def prevmonth(self, ctx, critter_type:str, hemisphere:str=None):
         if critter_type in self.valid_critter_types:
             if hemisphere is None:
@@ -111,7 +111,7 @@ More details at {bug['details_link']}"""
         self.handle_month_errors(ctx, error)
 
 
-    @commands.command()
+    @commands.command(aliases=['tm'])
     async def thismonth(self, ctx, critter_type:str, hemisphere:str=None):
         if critter_type in self.valid_critter_types:
             if hemisphere is None:
@@ -148,7 +148,7 @@ More details at {bug['details_link']}"""
         await self.handle_month_errors(ctx, error)
     
 
-    @commands.command()
+    @commands.command(aliases=['nm'])
     async def nextmonth(self, ctx, critter_type:str, hemisphere:str=None):
         if critter_type in self.valid_critter_types:
             if hemisphere is None:

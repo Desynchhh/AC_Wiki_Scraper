@@ -35,10 +35,12 @@ async def on_ready():
     print('Blathers, ready for action!')
 
 
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, discord.ext.commands.errors.CommandNotFound):
-        await ctx.send("I'm afraid that command does not exist.")
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
+#         await ctx.send("I'm afraid that command does not exist.")
+#     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
+#         await ctx.send("Calm down there! You're giving me WAY too many arguments for that command!")
 
 
 # Load all cogs
