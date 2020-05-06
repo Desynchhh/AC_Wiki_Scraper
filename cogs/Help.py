@@ -1,18 +1,22 @@
 import discord
 from discord.ext import commands
 
-from datetime import datetime
-
 from helpers.checks import is_owner
 from helpers.serversettings import Serversettings
 
 class Help(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:discord.ext.commands.Bot):
         self.bot = bot
         self.embed_colour = 0xF9D048
     
     @commands.group()
-    async def help(self, ctx):
+    async def help(self, ctx:discord.ext.commands.Context):
+        """Group for all help commands for the bot.
+        Sends out a general help message with a list of all commands if no command is specified.
+        Sends out 'owner only' commands if it is invoked by the server owner.
+
+        :type ctx: discord.ext.commands.Context
+        """
         if ctx.invoked_subcommand is None:
             prefix = Serversettings().get_prefix(ctx.guild.id)
             
@@ -35,12 +39,30 @@ class Help(commands.Cog):
             e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
 
             await ctx.send(embed=e)
+        
+    @help.command(aliases=['help'])
+    async def _help(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the help command. Helps users understand the help command.
+
+        :type ctx: discord.ext.commands.Context
+        """
+        prefix = Serversettings().get_prefix(ctx.guild.id)
+        e = discord.Embed(title=f"**{prefix}help [command]**", colour=self.embed_colour)
+        e.add_field(name="Shows a help message. You can also get more detailed help on each command.", value=
+            "**command**: The command you want more detailed help with.\n"
+            f"**Example**: {prefix}help thismonth", 
+        inline=False)
+        e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=e)
     
 
     @help.command(aliases=['f'])
-    async def fish(self, ctx):
+    async def fish(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the fish command. Helps users understand the fish command.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
-        hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}fish <name>**', colour=self.embed_colour)
         e.add_field(name=f'Shows information on the given fish.', value=
             "You need to type the fish's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
@@ -53,9 +75,12 @@ class Help(commands.Cog):
 
     
     @help.command(aliases=['b'])
-    async def bug(self, ctx):
+    async def bug(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the bug command. Helps users understand the bug command.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
-        hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}bug <name>**', colour=self.embed_colour)
         e.add_field(name='Shows information on a specified bug.', value=
             "You need to type the bug's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
@@ -67,8 +92,12 @@ class Help(commands.Cog):
         await ctx.send(embed=e)
 
 
-    @help.command(aliases=['pm'])
-    async def prevmonth(self, ctx):
+    @help.command(aliases=['pm', 'lastmonth', 'lm'])
+    async def prevmonth(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the prevmonth command. Helps users understand the prevmonth command.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}prevmonth <critter type> [hemisphere]**', colour=self.embed_colour)
@@ -76,14 +105,18 @@ class Help(commands.Cog):
             "**critter type**: The type of critter you wish you could have caught (fish or bugs).\n"
             "**hemisphere**: You can choose either the northern or southern hemisphere for this command.\n"
             f"**Example**: {prefix}prevmonth fish southern\n"
-            "**Aliases**: prevmonth, pm",
+            "**Aliases**: prevmonth, lastmonth, pm, lm",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
 
 
     @help.command(aliases=['tm'])
-    async def thismonth(self, ctx):
+    async def thismonth(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the thismonth command. Helps users understand the thismonth command.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}thismonth <critter type> [hemisphere]**', colour=self.embed_colour)
@@ -98,7 +131,11 @@ class Help(commands.Cog):
 
 
     @help.command(aliases=['nm'])
-    async def nextmonth(self, ctx):
+    async def nextmonth(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the nextmonth command. Helps users understand the nextmonth command.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}nextmonth <critter type> [hemisphere]**', colour=self.embed_colour)
@@ -114,12 +151,16 @@ class Help(commands.Cog):
 
     @help.command(aliases=['setp'])
     @commands.check(is_owner)
-    async def setprefix(self, ctx):
+    async def setprefix(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the setprefix command. Helps users understand the setprefix command.
+        Can only be invoked by the server owner.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
-        hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}setprefix <new prefix>**', colour=self.embed_colour)
         e.add_field(name='Sets a custom prefix for this bot on your server.',value=
-            "**new prefix**: The prefix you want to use for this bot on this server.\n"
+            "**new prefix**: The prefix you want to use for this bot on this server. It can be anything you want!.\n"
             f"**Example**: {prefix}setprefix !\n"
             "**Aliases**: setprefix, setp",
         inline=False)
@@ -129,7 +170,12 @@ class Help(commands.Cog):
 
     @help.command(aliases=['seth'])
     @commands.check(is_owner)
-    async def sethemisphere(self, ctx):
+    async def sethemisphere(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the sethemisphere command. Helps users understand the sethemisphere command.
+        Can only be invoked by the server owner.
+
+        :type ctx: discord.ext.commands.Context
+        """
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}sethemisphere <hemisphere>**', colour=self.embed_colour)
@@ -142,5 +188,5 @@ class Help(commands.Cog):
         await ctx.send(embed=e)
 
     
-def setup(bot):
+def setup(bot:discord.ext.commands.Bot):
     bot.add_cog(Help(bot))

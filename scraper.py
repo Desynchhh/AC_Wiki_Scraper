@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests, json, os
 
 def scrape_fish():
+    """Scrapes the ACNH Wiki for various data on the game's fish and saves the data in a JSON file."""
     # Get source data
     source = requests.get('https://animalcrossing.fandom.com/wiki/Fish_(New_Horizons)').text
     soup = BeautifulSoup(source, 'lxml')
@@ -18,8 +19,8 @@ def scrape_fish():
     table_cols = [col.text.strip() for col in n_table.find_all('th')]
     months = tuple(table_cols[6:])
 
-    # Constant number of rows in the tables
-    rows = len(table_cols)
+    # Constant number of cols in the tables
+    cols = len(table_cols)
     
     # Init dict
     fishes={}
@@ -27,7 +28,7 @@ def scrape_fish():
     base_url = 'https://animalcrossing.fandom.com'
 
     for i, fish in enumerate(n_table.find_all('td')):
-        curr_col = i%rows
+        curr_col = i%cols
 
         if curr_col == 0:               # Name
             name = fish.a.text.strip()
@@ -61,7 +62,7 @@ def scrape_fish():
             fishes[cur_fish]['months_available'] = {'northern': [], 'southern': []}
             fishes[cur_fish]['months_unavailable'] = {'northern': [], 'southern': []}
 
-            # Handle all months in one loop iterations (with nested loops)
+            # Handle all months in one loop iterations (using nested loops)
             n_months = n_table.find_all('td')[i:i+12]
             s_months = s_table.find_all('td')[i:i+12]
             
@@ -84,6 +85,7 @@ def scrape_fish():
 
 
 def scrape_bugs():
+    """Scrapes the ACNH Wiki for various data on the game's fish and saves the data in a JSON file."""
     # Get data from wiki
     source = requests.get('https://animalcrossing.fandom.com/wiki/Bugs_(New_Horizons)').text
     soup = BeautifulSoup(source, 'lxml')
@@ -100,7 +102,7 @@ def scrape_bugs():
     table_cols = [col.text.strip() for col in n_table.find_all('th')]
     
     months = table_cols[5:]
-    rows = len(table_cols)
+    cols = len(table_cols)
 
     # Init dict
     bugs={}
@@ -108,7 +110,7 @@ def scrape_bugs():
     base_url = 'https://animalcrossing.fandom.com'
 
     for i, bug in enumerate(n_table.find_all('td')):
-        curr_col = i%rows
+        curr_col = i%cols
         
         if curr_col == 0:               # Name
             name = bug.a.text.strip()
@@ -160,7 +162,8 @@ def scrape_bugs():
 
 
 
-def run_scraper():
+async def run_scraper():
+    """Runs all 'scrape' functions, as well as ensuring the JSON file exists."""
     if not os.path.exists('./json'):
         os.mkdir('json')
     scrape_fish()

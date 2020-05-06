@@ -1,20 +1,17 @@
 import discord
 
-import json
+def is_bot_owner(ctx:discord.ext.commands.Context) -> bool:
+    """Check if the context is sent by the bot owner.
 
-def is_bot_owner(ctx):
+    :type ctx: discord.ext.commands.Context
+    :rtype: bool
+    """
     return ctx.author.id == 228179496807694336
 
-def is_owner(ctx):
+def is_owner(ctx:discord.ext.commands.Context) -> bool:
+    """Check if the context is sent by the server owner.
+
+    :type ctx: discord.ext.commands.Context
+    :rtype: bool
+    """
     return ctx.author.id is ctx.guild.owner.id
-
-def is_admin(ctx):
-    if is_bot_owner(ctx) or is_owner(ctx):
-        return True
-    return ctx.author.id in get_admins()
-
-
-def get_admins():
-    with open('adminlist.json') as f:
-        adminlist = json.load(f)
-    return adminlist['admins']

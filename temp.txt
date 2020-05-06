@@ -1,9 +1,0 @@
-{
-    "valid_hemispheres": {
-        "northern": ["northern", "north", "nor", "n"],
-        "southern": ["southern", "south", "sou", "s"]
-    },
-    "servers": {
-
-    }
-}
