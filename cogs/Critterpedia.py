@@ -13,13 +13,13 @@ class Critterpedia(commands.Cog):
 
     @commands.command(aliases=['f'])
     async def fish(self, ctx:discord.ext.commands.Context, *, name:str):
-        """Searches for the given fish in the local JSON files.
+        """Searches for the specified fish in the local JSON files.
         If the fish is found, send out a formatted message with it's data.
         Else, raise an error.
 
         :type ctx: discord.ext.commands.Context
         :type name: str
-        :raises Exception: NoFishFound. The method could not find the given fish in the JSON file.
+        :raises Exception: NoFishFound. The method could not find the specified fish in the JSON file.
         """
         fish = get_critter('fish', name)
         if fish is None:
@@ -57,14 +57,14 @@ More details at {fish['details_link']}"""
 
     @commands.command(aliases=['b'])
     async def bug(self, ctx:discord.ext.commands.Context, *, name:str):
-        """Searches for the given bug in the local JSON files.
+        """Searches for the specified bug in the local JSON files.
         If the bug is found, send out a formatted message with it's data.
         Else, raise an error.
 
         :type ctx: discord.ext.commands.Context
         :type name: str
-        :raises Exception: NoBugFound. The method could not find the given bug in the JSON file.
-        """        
+        :raises Exception: NoBugFound. The method could not find the specified bug in the JSON file.
+        """
         bug = get_critter('bugs', name)
         if bug is None:
             raise Exception('NoBugFound', name)
@@ -100,43 +100,42 @@ More details at {bug['details_link']}"""
 
     @commands.command(aliases=['pm', 'lastmonth', 'lm'])
     async def prevmonth(self, ctx:discord.ext.commands.Context, critter_type:str, hemisphere:str=None):
-        """Gets all of the given critter type that were available last month, the month before, and the month after.
+        """Gets all of the specified critter type that were available last month, the month before, and the month after.
 
         :type ctx: discord.ext.commands.Context
         :type critter_type: str
         :type hemisphere: str, optional
         :raises Exception: WrongCritterType. The user supplied a type of critter that does not exist within the game.
         """
-        if critter_type in self.valid_critter_types:
-            if hemisphere is None:
-                hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
-            else:
-                hemisphere = self._verify_hemisphere(hemisphere)
-            critters = get_monthly_critters(critter_type, hemisphere, -2)
-            
-            e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
-            e.add_field(
-                name=f'{critter_type.capitalize()} that were active since {critters["prev_month"]}', 
-                value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
-                inline=False
-            )
-
-            e.add_field(
-                name=f'{critter_type.capitalize()} that were new to {critters["this_month"]}!',
-                value=", ".join([critter['name'] for critter in critters['new_critters']]),
-                inline=False
-            )
-            
-            e.add_field(
-                name=f'{critter_type.capitalize()} that left in {critters["next_month"]}',
-                value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
-                inline=False
-            )
-            
-            await ctx.send(embed=e)
-
-        else:
+        critter_type = critter_type.lower()
+        if critter_type not in self.valid_critter_types:
             raise Exception('WrongCritterType')
+        
+        hemisphere = self._verify_hemisphere(ctx.guild.id, hemisphere)
+        if isinstance(hemisphere, Exception):
+            raise hemisphere
+        critters = get_monthly_critters(critter_type, hemisphere, -2)
+        
+        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e.add_field(
+            name=f'{critter_type.capitalize()} that were active since {critters["prev_month"]}', 
+            value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
+            inline=False
+        )
+
+        e.add_field(
+            name=f'{critter_type.capitalize()} that were new to {critters["this_month"]}!',
+            value=", ".join([critter['name'] for critter in critters['new_critters']]),
+            inline=False
+        )
+        
+        e.add_field(
+            name=f'{critter_type.capitalize()} that left in {critters["next_month"]}',
+            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            inline=False
+        )
+        
+        await ctx.send(embed=e)
     
     @prevmonth.error
     async def prevmont_error(self, ctx:discord.ext.commands.Context, error:discord.ext.commands.errors.DiscordException):
@@ -145,48 +144,47 @@ More details at {bug['details_link']}"""
         :type ctx: discord.ext.commands.Context
         :type error: discord.ext.commands.errors.DiscordException
         """
-        self.handle_month_errors(ctx, error)
+        await self.handle_month_errors(ctx, error)
 
 
     @commands.command(aliases=['tm'])
     async def thismonth(self, ctx:discord.ext.commands.Context, critter_type:str, hemisphere:str=None):
-        """Gets all of the given critter type that are available this month, the last month, and the next month.
+        """Gets all of the specified critter type that are available this month, the last month, and the next month.
 
         :type ctx: discord.ext.commands.Context
         :type critter_type: str
         :type hemisphere: str, optional
         :raises Exception: WrongCritterType. The user supplied a type of critter that does not exist within the game.
         """
-        if critter_type in self.valid_critter_types:
-            if hemisphere is None:
-                hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
-            else:
-                hemisphere = self._verify_hemisphere(hemisphere)
-            critters = get_monthly_critters(critter_type, hemisphere)
-            
-            e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
-            e.add_field(
-                name=f'{critter_type.capitalize()} that have stayed since {critters["prev_month"]}', 
-                value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
-                inline=False
-            )
-
-            e.add_field(
-                name=f'{critter_type.capitalize()} that are new for {critters["this_month"]}!',
-                value=", ".join([critter['name'] for critter in critters['new_critters']]),
-                inline=False
-            )
-
-            e.add_field(
-                name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
-                value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
-                inline=False
-            )
-
-            await ctx.send(embed=e)
-        
-        else:
+        critter_type = critter_type.lower()
+        if critter_type not in self.valid_critter_types:
             raise Exception('WrongCritterType')
+
+        hemisphere = self._verify_hemisphere(ctx.guild.id, hemisphere)
+        if isinstance(hemisphere, Exception):
+            raise hemisphere
+        critters = get_monthly_critters(critter_type, hemisphere)
+        
+        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e.add_field(
+            name=f'{critter_type.capitalize()} that have stayed since {critters["prev_month"]}', 
+            value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
+            inline=False
+        )
+
+        e.add_field(
+            name=f'{critter_type.capitalize()} that are new for {critters["this_month"]}!',
+            value=", ".join([critter['name'] for critter in critters['new_critters']]),
+            inline=False
+        )
+
+        e.add_field(
+            name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
+            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            inline=False
+        )
+
+        await ctx.send(embed=e)
     
     @thismonth.error
     async def thismonth_error(self, ctx:discord.ext.commands.Context, error:discord.ext.commands.errors.DiscordException):
@@ -200,43 +198,42 @@ More details at {bug['details_link']}"""
 
     @commands.command(aliases=['nm'])
     async def nextmonth(self, ctx:discord.ext.commands.Context, critter_type:str, hemisphere:str=None):
-        """Gets all of the given critter type that are available this month, next month, and the month after.
+        """Gets all of the specified critter type that are available this month, next month, and the month after.
 
         :type ctx: discord.ext.commands.Context
         :type critter_type: str
         :type hemisphere: str, optional
         :raises Exception: WrongCritterType. The user supplied a type of critter that does not exist within the game.
         """
-        if critter_type in self.valid_critter_types:
-            if hemisphere is None:
-                hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
-            else:
-                hemisphere = self._verify_hemisphere(hemisphere)
-            critters = get_monthly_critters(critter_type, hemisphere, 0)
-            
-            e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
-            e.add_field(
-                name=f'{critter_type.capitalize()} that will stay after {critters["prev_month"]}', 
-                value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
-                inline=False
-            )
-
-            e.add_field(
-                name=f'{critter_type.capitalize()} that will be new for {critters["this_month"]}!',
-                value=", ".join([critter['name'] for critter in critters['new_critters']]),
-                inline=False
-            )
-            
-            e.add_field(
-                name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
-                value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
-                inline=False
-            )
-
-            await ctx.send(embed=e)
-        
-        else:
+        critter_type = critter_type.lower()
+        if critter_type not in self.valid_critter_types:
             raise Exception('WrongCritterType')
+
+        hemisphere = self._verify_hemisphere(ctx.guild.id, hemisphere)
+        if isinstance(hemisphere, Exception):
+            raise hemisphere
+        critters = get_monthly_critters(critter_type, hemisphere, 0)
+        
+        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e.add_field(
+            name=f'{critter_type.capitalize()} that will stay after {critters["prev_month"]}', 
+            value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
+            inline=False
+        )
+
+        e.add_field(
+            name=f'{critter_type.capitalize()} that will be new for {critters["this_month"]}!',
+            value=", ".join([critter['name'] for critter in critters['new_critters']]),
+            inline=False
+        )
+        
+        e.add_field(
+            name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
+            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            inline=False
+        )
+
+        await ctx.send(embed=e)
  
     @nextmonth.error
     async def nextmonth_error(self, ctx:discord.ext.commands.Context, error:discord.ext.commands.errors.DiscordException):
@@ -267,23 +264,24 @@ More details at {bug['details_link']}"""
             await ctx.send(self.default_error_msg)
 
 
-    def _verify_hemisphere(self, hemisphere:str) -> str:
-        """Verifies the given hemisphere is valid by looking through the serversettings JSON file.
+    def _verify_hemisphere(self, guild_id:str, hemisphere:str) -> str:
+        """Verifies the specified hemisphere is valid by looking through the serversettings JSON file.
 
         :type hemisphere: str
-        :raises Exception: HemisphereDoesNotExist. The method could not find the given hemisphere in the serversettings JSON file.
-        :rtype: str
+        :raises Exception: HemisphereDoesNotExist. The method could not find the specified hemisphere in the serversettings JSON file.
+        :rtype: str, Exception
         """
+        if hemisphere is None:
+            return Serversettings().get_hemisphere(guild_id)
+        
+        hemisphere = hemisphere.lower()
         valid_hemispheres = Serversettings().get_valid_hemispheres()
-        if hemisphere in valid_hemispheres['northern'] or hemisphere in valid_hemispheres['southern']:
-            for hs in valid_hemispheres:
-                if hemisphere in hs:
-                    hemisphere = hs
-                    break
-            return hemisphere
+        if hemisphere in valid_hemispheres['northern']:
+            return 'northern'
+        elif hemisphere in valid_hemispheres['southern']:
+            return 'southern'
         else:
-            raise Exception('HemisphereDoesNotExist', hemisphere)
-
+            return Exception('HemisphereDoesNotExist', hemisphere)
 
 
 def setup(bot:discord.ext.commands.Bot):

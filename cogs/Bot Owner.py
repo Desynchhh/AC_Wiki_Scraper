@@ -15,7 +15,7 @@ class BotOwner(commands.Cog):
         """Forcefully runs scrapers, updating the local critter data.
 
         :type ctx: discord.ext.commands.Context"""
-        run_scraper()
+        await run_scraper()
         await ctx.send('Updated JSON data')
     
 
