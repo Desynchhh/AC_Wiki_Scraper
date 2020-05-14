@@ -25,8 +25,11 @@ class Critterpedia(commands.Cog):
         if fish is None:
             raise Exception('NoFishFound', name)
 
+        has_quote = fish['name'].lower() in fish['catchquote'].lower()
+        display_name = f"{fish['name']} - *{fish['catchquote']}*" if has_quote else fish['name']
+
         message = f"""
-{fish['name']} - *{fish['catchquote']}*
+{display_name}
 Selling price: {fish['nook_price']}
 C.J. selling price: {fish['cj_price']}
 Location: {fish['location']}
@@ -69,8 +72,11 @@ More details at {fish['details_link']}"""
         if bug is None:
             raise Exception('NoBugFound', name)
 
+        has_quote = bug['name'].lower() in bug['catchquote'].lower()
+        display_name = f"{bug['name']} - *{bug['catchquote']}*" if has_quote else bug['name']
+
         message = f"""
-{bug['name']} - *{bug['catchquote']}*
+{display_name}
 Selling price: {bug['nook_price']}
 Flick selling price: {bug['flick_price']}
 Location: {bug['location']}

@@ -66,6 +66,7 @@ class Help(commands.Cog):
         e = discord.Embed(title=f'**{prefix}fish <name>**', colour=self.embed_colour)
         e.add_field(name=f'Shows information on the given fish.', value=
             "You need to type the fish's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
+            "Sadly, not all the fish's catch quotes are available on the wiki, but most of them are!\n"
             "**name**: Name of the fish you wish to know about.\n"
             f"**Example**: {prefix}fish pop-eyed goldfish\n"
             "**Aliases**: fish, f",
@@ -84,6 +85,7 @@ class Help(commands.Cog):
         e = discord.Embed(title=f'**{prefix}bug <name>**', colour=self.embed_colour)
         e.add_field(name='Shows information on a specified bug.', value=
             "You need to type the bug's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
+            "Sadly, not all the bugs' catch quotes are available on the wiki, but most of them are!\n"
             "**name**: Name of the bug you wish to know about.\n"
             f"**Example**: {prefix}bug common butterfly\n"
             "**Aliases**: bug, b",

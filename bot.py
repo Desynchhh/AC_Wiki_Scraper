@@ -64,8 +64,7 @@ async def on_command_error(ctx:discord.ext.commands.Context, error:discord.ext.c
 
 @tasks.loop(hours=168)
 async def update_critterpedia():
-    """Background task that runs the wiki scraper once a week, just in case anything changes once in a while.
-    """
+    """Background task that runs the wiki scraper once a week, just in case anything changes once in a while."""
     await run_scraper()
 
 
