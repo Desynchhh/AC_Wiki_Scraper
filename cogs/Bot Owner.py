@@ -8,6 +8,18 @@ class BotOwner(commands.Cog):
     def __init__(self, bot:discord.ext.commands.Bot):
         self.bot = bot
 
+    
+    @commands.command()
+    @commands.check(is_bot_owner)
+    async def gettotalservers(self, ctx:discord.ext.commands.Context):
+        await ctx.send(f"I am currently in {len(self.bot.guilds)} servers!")
+    
+
+    @commands.command()
+    @commands.check(is_bot_owner)
+    async def getservers(self, ctx:discord.ext.commands.Context):
+        await ctx.send([server.name for server in self.bot.guilds])
+
 
     @commands.command()
     @commands.check(is_bot_owner)

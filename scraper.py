@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
-import requests, json, os
+import requests, json, os, re
+
+base_url = 'https://animalcrossing.fandom.com'
+
 
 def scrape_fish():
     """Scrapes the ACNH Wiki for various data on the game's fish and saves the data in a JSON file."""
@@ -25,23 +28,26 @@ def scrape_fish():
     # Init dict
     fishes={}
 
-    base_url = 'https://animalcrossing.fandom.com'
-
     for i, fish in enumerate(n_table.find_all('td')):
         curr_col = i%cols
 
         if curr_col == 0:               # Name
             name = fish.a.text.strip()
             cur_fish = name.lower()
-            details_uri = fish.a['href']
-            fishes[cur_fish] = {'name': name, 'details_link': base_url + details_uri}
+            details_link = base_url + fish.a['href']
+            quote = scrape_quote(name, details_link)
+            fishes[cur_fish] = {
+                'name': name,
+                'details_link': details_link,
+                'catchquote': quote    
+            }
         
         elif curr_col == 1:             # Image
             img_link = fish.a['href']
             fishes[cur_fish]['image'] = img_link
 
         elif curr_col == 2:             # Price
-            price = int(fish.text.strip())
+            price = int(fish.text.strip().replace(',',''))
             fishes[cur_fish]['nook_price'] = price
             fishes[cur_fish]['cj_price'] = int(price*1.5)
 
@@ -107,23 +113,27 @@ def scrape_bugs():
     # Init dict
     bugs={}
 
-    base_url = 'https://animalcrossing.fandom.com'
-
     for i, bug in enumerate(n_table.find_all('td')):
         curr_col = i%cols
         
         if curr_col == 0:               # Name
             name = bug.a.text.strip()
             cur_bug = name.lower()
-            details_uri = bug.a['href']
-            bugs[cur_bug] = {'name': name, 'details_link': base_url + details_uri }
+            details_link = base_url + bug.a['href']
+            quote = scrape_quote(name, details_link)
+            
+            bugs[cur_bug] = {
+                'name': name,
+                'details_link': details_link,
+                'catchquote': quote
+            }
         
         elif curr_col == 1:             # Image
             img_link = bug.a['href']
             bugs[cur_bug]['image'] = img_link
         
         elif curr_col == 2:             # Price
-            price = int(bug.text.strip())
+            price = int(bug.text.strip().replace(',',''))
             bugs[cur_bug]['nook_price'] = price
             bugs[cur_bug]['flick_price'] = int(price*1.5)
        
@@ -159,6 +169,46 @@ def scrape_bugs():
 
     with open('json/bugs.json', 'w') as f:
         json.dump(bugs, f)
+
+
+def scrape_quote(critter_name:str, details_link:str):
+    no_quote = 'The catch quote for this critter is not yet available on the wiki. Sorry.'
+    source = requests.get(details_link).text
+    soup = BeautifulSoup(source, 'lxml')
+    header = soup.find(None, {'id': 'New_Horizons'})
+    try:
+        table = header.find_next('table').table
+        quote = table.find_next('td').text.strip()
+        quote = re.sub(r'[\\"“”]', '', quote)
+        if critter_name.lower() not in quote.lower():
+            quote = no_quote
+    except:
+        quote = no_quote
+    return quote
+
+
+# def scrape_quotes():
+#     no_quote = 'The catch quote for this critter is not yet available on the wiki. Sorry.'
+#     for fj in os.listdir('json'):
+#         if fj.endswith('.json'):
+#             with open(f'json/{fj}', 'r') as f:
+#                 data = json.load(f)
+            
+#             for _, critter in data.items():
+#                 print(critter['name'])
+#                 source = requests.get(critter['details_link']).text
+#                 soup = BeautifulSoup(source, 'lxml')
+#                 print(soup.find_all(None, {'id': 'New_Horizons'}))
+#                 header = soup.find(None, {'id': 'New_Horizons'})
+#                 try:
+#                     table = header.find_next('table').table
+#                     quote = table.find_next('td').text.strip().replace('"','')
+#                     if critter['name'].lower() not in quote.lower():
+#                         quote = no_quote
+#                 except:
+#                     quote = no_quote
+#                 print(quote)
+#                 print()
 
 
 

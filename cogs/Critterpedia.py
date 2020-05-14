@@ -14,7 +14,7 @@ class Critterpedia(commands.Cog):
     @commands.command(aliases=['f'])
     async def fish(self, ctx:discord.ext.commands.Context, *, name:str):
         """Searches for the specified fish in the local JSON files.
-        If the fish is found, send out a formatted message with it's data.
+        If the fish is found, send out a formatted message with its data.
         Else, raise an error.
 
         :type ctx: discord.ext.commands.Context
@@ -26,7 +26,7 @@ class Critterpedia(commands.Cog):
             raise Exception('NoFishFound', name)
 
         message = f"""
-{fish['name']}
+{fish['name']} - *{fish['catchquote']}*
 Selling price: {fish['nook_price']}
 C.J. selling price: {fish['cj_price']}
 Location: {fish['location']}
@@ -49,7 +49,7 @@ More details at {fish['details_link']}"""
         
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'NoFishFound':
-                await ctx.send(f"I am sorry, I was unable to find a fish called {error.original.args[1]}. Are you certain you spelled it's name correctly?")
+                await ctx.send(f"I am sorry, I was unable to find a fish called {error.original.args[1]}. Are you certain you spelled its name correctly?")
 
         else:
             await ctx.send(self.default_error_msg)
@@ -58,7 +58,7 @@ More details at {fish['details_link']}"""
     @commands.command(aliases=['b'])
     async def bug(self, ctx:discord.ext.commands.Context, *, name:str):
         """Searches for the specified bug in the local JSON files.
-        If the bug is found, send out a formatted message with it's data.
+        If the bug is found, send out a formatted message with its data.
         Else, raise an error.
 
         :type ctx: discord.ext.commands.Context
@@ -70,7 +70,7 @@ More details at {fish['details_link']}"""
             raise Exception('NoBugFound', name)
 
         message = f"""
-{bug['name']}
+{bug['name']} - *{bug['catchquote']}*
 Selling price: {bug['nook_price']}
 Flick selling price: {bug['flick_price']}
 Location: {bug['location']}
@@ -92,7 +92,7 @@ More details at {bug['details_link']}"""
         
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'NoBugFound':
-                await ctx.send(f"I'm afraid' I was unable to find a bug called {error.original.args[1]}. Are you certain you spelled it's name correctly?")
+                await ctx.send(f"I'm afraid' I was unable to find a bug called {error.original.args[1]}. Are you certain you spelled its name correctly?")
 
         else:
             await ctx.send(self.default_error_msg)

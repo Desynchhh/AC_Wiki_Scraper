@@ -53,16 +53,18 @@ async def on_command_error(ctx:discord.ext.commands.Context, error:discord.ext.c
     :raises error: Raises the error if the generic handler was unable to handle it, so other handlers can take care of it.
     """
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
-        await ctx.send("I'm afraid that command does not exist.")
+        await ctx.send("I'm afraid that command does not exist")
     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
         await ctx.send("Calm down there! You're giving me WAY too many arguments for that command!")
+    elif isinstance(error, discord.ext.commands.errors.CommandInvokeError) and isinstance(error.original, discord.errors.Forbidden):
+        await ctx.send("I'm afraid I don't have the required permissions to do that")
     else:
         raise error
 
 
 @tasks.loop(hours=168)
 async def update_critterpedia():
-    """Background task that runs the wiki scraper once a month, just in case anything changes once in a while.
+    """Background task that runs the wiki scraper once a week, just in case anything changes once in a while.
     """
     await run_scraper()
 
