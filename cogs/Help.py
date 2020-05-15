@@ -3,6 +3,7 @@ from discord.ext import commands
 
 from helpers.checks import is_owner
 from helpers.serversettings import Serversettings
+from logger import log_command
 
 class Help(commands.Cog):
     def __init__(self, bot:discord.ext.commands.Bot):
@@ -18,6 +19,7 @@ class Help(commands.Cog):
         :type ctx: discord.ext.commands.Context
         """
         if ctx.invoked_subcommand is None:
+            await log_command(ctx, 'help', None)
             prefix = Serversettings().get_prefix(ctx.guild.id)
             
             e = discord.Embed(title=f'{self.bot.user.name} Help Command', colour=self.embed_colour, description="When looking up specific commands, arguments in <tags> are required, and arguments in [brackets] are optional.")
@@ -46,6 +48,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'help')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         e = discord.Embed(title=f"**{prefix}help [command]**", colour=self.embed_colour)
         e.add_field(name="Shows a help message. You can also get more detailed help on each command.", value=
@@ -62,6 +65,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'fish')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}fish <name>**', colour=self.embed_colour)
         e.add_field(name=f'Shows information on the given fish.', value=
@@ -81,6 +85,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'bug')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}bug <name>**', colour=self.embed_colour)
         e.add_field(name='Shows information on a specified bug.', value=
@@ -100,6 +105,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'prevmonth')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}prevmonth <critter type> [hemisphere]**', colour=self.embed_colour)
@@ -119,6 +125,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'thismonth')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}thismonth <critter type> [hemisphere]**', colour=self.embed_colour)
@@ -138,6 +145,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'nextmonth')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}nextmonth <critter type> [hemisphere]**', colour=self.embed_colour)
@@ -159,6 +167,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'setprefix')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}setprefix <new prefix>**', colour=self.embed_colour)
         e.add_field(name='Sets a custom prefix for this bot on your server.',value=
@@ -178,6 +187,7 @@ class Help(commands.Cog):
 
         :type ctx: discord.ext.commands.Context
         """
+        await log_command(ctx, 'help', 'sethemisphere')
         prefix = Serversettings().get_prefix(ctx.guild.id)
         hemisphere = Serversettings().get_hemisphere(ctx.guild.id)
         e = discord.Embed(title=f'**{prefix}sethemisphere <hemisphere>**', colour=self.embed_colour)

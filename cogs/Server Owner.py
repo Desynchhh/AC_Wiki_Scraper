@@ -3,6 +3,7 @@ from discord.ext import commands
 
 from helpers.checks import is_owner
 from helpers.serversettings import Serversettings
+from logger import log_command
 
 class ServerOwner(commands.Cog):
     def __init__(self, bot:discord.ext.commands.Bot):
@@ -16,6 +17,7 @@ class ServerOwner(commands.Cog):
         :type ctx: discord.ext.commands.Context
         :type prefix: str
         """
+        await log_command(ctx, "setprefix", prefix)
         serversettings = Serversettings().load()
         
         guild_id = str(ctx.guild.id)
@@ -50,6 +52,7 @@ class ServerOwner(commands.Cog):
         :type hemisphere: str
         :raises Exception: HemisphereDoesNotExist. The method could not find the given hemisphere in the serversettings JSON file.
         """
+        await log_command(ctx, "sethemisphere", hemisphere)
         hemisphere = hemisphere.lower()
         valid_hemispheres = Serversettings().get_valid_hemispheres()
         if hemisphere in valid_hemispheres['northern'] or hemisphere in valid_hemispheres['southern']:
@@ -69,7 +72,7 @@ class ServerOwner(commands.Cog):
             await ctx.send(f'The default hemisphere is now `{hemisphere}`')
         
         else:
-            raise Exception('HemisphereDoesNotExist')
+            raise Exception('HemisphereDoesNotExist', hemisphere)
 
     @sethemisphere.error
     async def sethemisphere_error(self, ctx:discord.ext.commands.Context, error:discord.ext.commands.errors.DiscordException):

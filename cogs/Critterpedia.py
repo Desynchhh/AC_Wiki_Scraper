@@ -4,6 +4,8 @@ from discord.ext import commands
 from helpers.jsonreader import get_critter, get_monthly_critters
 from helpers.serversettings import Serversettings
 
+from logger import log_command
+
 class Critterpedia(commands.Cog):
     def __init__(self, bot:discord.ext.commands.Bot):
         self.bot = bot
@@ -21,6 +23,7 @@ class Critterpedia(commands.Cog):
         :type name: str
         :raises Exception: NoFishFound. The method could not find the specified fish in the JSON file.
         """
+        await log_command(ctx, 'fish', name)
         fish = get_critter('fish', name)
         if fish is None:
             raise Exception('NoFishFound', name)
@@ -68,6 +71,7 @@ More details at {fish['details_link']}"""
         :type name: str
         :raises Exception: NoBugFound. The method could not find the specified bug in the JSON file.
         """
+        await log_command(ctx, 'bug', name)
         bug = get_critter('bugs', name)
         if bug is None:
             raise Exception('NoBugFound', name)
@@ -113,6 +117,7 @@ More details at {bug['details_link']}"""
         :type hemisphere: str, optional
         :raises Exception: WrongCritterType. The user supplied a type of critter that does not exist within the game.
         """
+        await log_command(ctx, "prevmonth", critter_type, hemisphere)
         critter_type = critter_type.lower()
         if critter_type not in self.valid_critter_types:
             raise Exception('WrongCritterType')
@@ -162,6 +167,7 @@ More details at {bug['details_link']}"""
         :type hemisphere: str, optional
         :raises Exception: WrongCritterType. The user supplied a type of critter that does not exist within the game.
         """
+        await log_command(ctx, "thismonth", critter_type, hemisphere)
         critter_type = critter_type.lower()
         if critter_type not in self.valid_critter_types:
             raise Exception('WrongCritterType')
@@ -211,6 +217,7 @@ More details at {bug['details_link']}"""
         :type hemisphere: str, optional
         :raises Exception: WrongCritterType. The user supplied a type of critter that does not exist within the game.
         """
+        await log_command(ctx, "nextmonth", critter_type, hemisphere)
         critter_type = critter_type.lower()
         if critter_type not in self.valid_critter_types:
             raise Exception('WrongCritterType')

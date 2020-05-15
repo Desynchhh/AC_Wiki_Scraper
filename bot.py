@@ -6,6 +6,7 @@ import os
 
 from helpers.serversettings import Serversettings
 from scraper import run_scraper
+from logger import log_error
 
 
 # Load .env file
@@ -38,8 +39,7 @@ bot.remove_command('help')
 
 @bot.event
 async def on_ready():
-    """The bot's on_ready event. Starts background tasks as well as notifies the console the bot is ready.
-    """
+    """The bot's on_ready event. Starts background tasks as well as notifies the console the bot is ready."""
     # update_critterpedia.start()
     print('Celeste, ready for action!')
 
@@ -52,6 +52,7 @@ async def on_command_error(ctx:discord.ext.commands.Context, error:discord.ext.c
     :type error: discord.ext.commands.errors.DiscordException
     :raises error: Raises the error if the generic handler was unable to handle it, so other handlers can take care of it.
     """
+    # await log_error(ctx, error)
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.send("I'm afraid that command does not exist")
     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
