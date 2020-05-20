@@ -52,7 +52,7 @@ async def on_command_error(ctx:discord.ext.commands.Context, error:discord.ext.c
     :type error: discord.ext.commands.errors.DiscordException
     :raises error: Raises the error if the generic handler was unable to handle it, so other handlers can take care of it.
     """
-    # await log_error(ctx, error)
+    await log_error(ctx, error)
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.send("I'm afraid that command does not exist")
     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
