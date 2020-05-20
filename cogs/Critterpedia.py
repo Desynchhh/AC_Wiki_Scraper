@@ -28,7 +28,7 @@ class Critterpedia(commands.Cog):
         if fish is None:
             raise Exception('NoFishFound', name)
 
-        has_quote = fish['name'].lower() in fish['catchquote'].lower()
+        has_quote = fish['catchquote'] != 'The catch quote for this critter is not yet available on the wiki. Sorry.'
         display_name = f"{fish['name']} - *{fish['catchquote']}*" if has_quote else fish['name']
 
         message = f"""
@@ -84,6 +84,7 @@ More details at {fish['details_link']}"""
 Selling price: {bug['nook_price']}
 Flick selling price: {bug['flick_price']}
 Location: {bug['location']}
+Rarity: {bug['rarity']}
 Active hours: {bug['active_hours']}
 Active months (northern): {'All year' if len(bug['months_available']['northern']) == 12 else ', '.join(bug['months_available']['northern'])}
 Active months (southern): {'All year' if len(bug['months_available']['southern']) == 12 else ', '.join(bug['months_available']['southern'])}

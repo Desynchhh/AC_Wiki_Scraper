@@ -1,3 +1,9 @@
+#################################################
+# DEPRECATED SCRIPT                             #
+# This scraper scrapes an outdated wiki site    #
+# Nookipedia is a lot more up to date           #
+#################################################
+
 from bs4 import BeautifulSoup
 import requests, json, os, re
 

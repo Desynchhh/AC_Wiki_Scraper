@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 
 from helpers.checks import is_bot_owner
-from scraper import run_scraper
+from scraper_v2 import run_scraper
+
+import time
 
 class BotOwner(commands.Cog):
     def __init__(self, bot:discord.ext.commands.Bot):
@@ -27,8 +29,10 @@ class BotOwner(commands.Cog):
         """Forcefully runs scrapers, updating the local critter data.
 
         :type ctx: discord.ext.commands.Context"""
-        await run_scraper()
-        await ctx.send('Updated JSON data')
+        t1 = time.time()
+        async with ctx.typing():
+            await run_scraper()
+        await ctx.send(f'Updated JSON data in {round(time.time()-t1, 2)} seconds.')
     
 
     @commands.command()

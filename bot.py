@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 from helpers.serversettings import Serversettings
-from scraper import run_scraper
+from scraper_v2 import run_scraper
 from logger import log_error
 
 
