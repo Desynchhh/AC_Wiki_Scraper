@@ -72,10 +72,12 @@ def scrape_fish():
                     fishes[curr_fish]['months_unavailable']['southern'].append(m)
             continue
         
-        elif i == 8:    # Rarity
+        elif curr_col == 8:    # Rarity
             continue
 
-        elif i == 9:    # Total Catches
+        elif curr_col == 9:    # Total Catches
+            total_catches = fish.text.strip()
+            fishes[curr_fish]['total_catches'] = total_catches
             continue
 
         # if i >= 10:  # Done with 1st fish (Used for testing purposes)
@@ -168,7 +170,7 @@ def scrape_bugs():
         elif curr_col == 9:   # Peak
             continue
         
-        # elif i >= 10:  # Done with 1st bug (Used for testing purposes)
+        # if i >= 10:  # Done with 1st bug (Used for testing purposes)
         #     break
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -199,6 +201,80 @@ def scrape_sea_creatures():
 
         if curr_col == 0:   # ID
             continue
+
+        elif curr_col == 1: # Name
+            name = sea_creature.text.strip()
+            curr_sc = name.lower()
+            details_link = base_url + sea_creature.a.get('href')
+            sea_creatures[curr_sc] = {
+                "name": name,
+                "details_link": details_link
+            }
+            continue
+
+        elif curr_col == 2: # Image
+            continue
+
+        elif curr_col == 3: # Price
+            raw_price = sea_creature.text.strip()
+            price = int(re.sub(r'\D', '', raw_price))
+            sea_creatures[curr_sc]['nook_price'] = price
+            continue
+
+        elif curr_col == 4: # Size
+            size = sea_creature.text.strip()
+            sea_creatures[curr_sc]['shadow_size'] = size
+            continue
+
+        elif curr_col == 5: # Movement
+            movement = sea_creature.text.strip()
+            sea_creatures[curr_sc]['shadow_movement'] = movement
+            continue
+
+        elif curr_col == 6: # Rarity
+            continue
+
+        elif curr_col == 7: # Total catches
+            total_catches = sea_creature.text.strip()
+            sea_creatures[curr_sc]['total_catches'] = total_catches
+            continue
+
+        elif curr_col == 8: # Time
+            time = sea_creature.text.strip()
+            sea_creatures[curr_sc]['active_hours'] = time
+            continue
+
+        elif curr_col == 9: # Months
+            sea_creatures[curr_sc]['months_available'] = {'northern': [], 'southern': []}
+            sea_creatures[curr_sc]['months_unavailable'] = {'northern': [], 'southern': []}
+            n, s = handle_months(sea_creature)
+            
+            for k, m in enumerate(months):
+                if n[k][1] is True:
+                    sea_creatures[curr_sc]['months_available']['northern'].append(m)
+                else:
+                    sea_creatures[curr_sc]['months_unavailable']['northern'].append(m)
+                
+                if s[k][1] is True:
+                    sea_creatures[curr_sc]['months_available']['southern'].append(m)
+                else:
+                    sea_creatures[curr_sc]['months_unavailable']['southern'].append(m)
+            continue
+
+        # if i >= 9:   # Done with 1st sea creature (Used for testing purposes)
+        #     break
+    
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        detail_links = tuple(sea_creature['details_link'] for sea_creature in sea_creatures.values())
+        results = executor.map(scrape_quote, detail_links)
+
+        sea_creature_keys = list(sea_creatures)
+        for i, result in enumerate(results):
+            sea_creatures[sea_creature_keys[i]]['catchquote'] = result
+
+    with open(os.path.join('json', 'seacreatures.json'), 'w') as f:
+        json.dump(sea_creatures, f)
+
 
 
 
@@ -247,17 +323,16 @@ def scrape_quote(details_link:str):
         return None
 
 
+
 async def run_scraper():
     if not os.path.exists('json'):
         os.mkdir('json')
 
     t0 = time.perf_counter()
+    
+    funcs_to_run = (scrape_fish, scrape_bugs, scrape_sea_creatures)
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        print('Running "scrape_fish"...')
-        f_fish = executor.submit(scrape_fish)
-        
-        print('Running "scrape_bugs"...')
-        f_bugs = executor.submit(scrape_bugs)
+        executor.map(lambda x: x(), funcs_to_run)
     
     t2 = time.perf_counter()
     print('Total time taken:', t2-t0, 'seconds')

@@ -2,7 +2,7 @@ import json, os
 from datetime import datetime
 
 FILEPATH = 'json'
-MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+MONTHS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
 
 def get_critter(filename:str, critter_name:str):
     """Gets the specified critter in it's respective JSON file. Returns None if it doesn't exist.
@@ -40,6 +40,21 @@ def get_monthly_critters(filename:str, hemisphere:str, month_period:int=-1) -> d
     new_critters = [critter for critter in monthly_critters if prev_month not in critter['months_available'][hemisphere]]
     recurring_critters = [critter for critter in monthly_critters if critter not in new_critters]
     leaving_critters = [critter for critter in monthly_critters if next_month not in critter['months_available'][hemisphere]]
+
+    if len(new_critters) <= 0:
+        new_critters = f'No new {filename} have appeared in {this_month}'
+    else:
+        new_critters = ", ".join([critter['name'] for critter in new_critters])
+
+    if len(recurring_critters) <= 0:
+        recurring_critters = f'No {filename} have stayed since {prev_month}'
+    else:
+        recurring_critters = ", ".join([critter['name'] for critter in recurring_critters])
+
+    if len(leaving_critters) <= 0:
+        leaving_critters = f'No {filename} will be leaving in {next_month}'
+    else:
+        leaving_critters = ", ".join([critter['name'] for critter in leaving_critters])
 
     return {
         'prev_month': prev_month,

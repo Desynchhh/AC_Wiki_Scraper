@@ -10,7 +10,7 @@ class Critterpedia(commands.Cog):
     def __init__(self, bot:discord.ext.commands.Bot):
         self.bot = bot
         self.default_error_msg = "I am sorry, but something went wrong. I am uncertain whether it was something you did, or something I did hoo.."
-        self.valid_critter_types = ['fish', 'bugs']
+        self.valid_critter_types = ['fish', 'bugs', 'seacreatures']
 
 
     @commands.command(aliases=['f'])
@@ -40,6 +40,7 @@ Shadow size: {fish['shadow_size']}
 Active hours: {fish['active_hours']}
 Active months (northern): {'All year' if len(fish['months_available']['northern']) == 12 else ', '.join(fish['months_available']['northern'])}
 Active months (southern): {'All year' if len(fish['months_available']['southern']) == 12 else ', '.join(fish['months_available']['southern'])}
+Total catches required to spawn: {fish['total_catches']}
 More details at {fish['details_link']}"""
         await ctx.send(message)
 
@@ -103,7 +104,55 @@ More details at {bug['details_link']}"""
         
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'NoBugFound':
-                await ctx.send(f"I'm afraid' I was unable to find a bug called {error.original.args[1]}. Are you certain you spelled its name correctly?")
+                await ctx.send(f"I'm afraid I was unable to find a bug called {error.original.args[1]}. Are you certain you spelled its name correctly?")
+
+        else:
+            await ctx.send(self.default_error_msg)
+
+
+    @commands.command(aliases=['sc', 'sea_creature'])
+    async def seacreature(self, ctx:discord.ext.commands.Context, *, name:str):
+        """Searches for the specified sea creature in the local JSON files.
+        If the sea creature is found, send out a formatted message with its data.
+        Else, raise an error.
+
+        :type ctx: discord.ext.commands.Context
+        :type name: str
+        :raises Exception: NoSeaCreatureFound. The method could not find the specified sea creature in the JSON file.
+        """
+        await log_command(ctx, 'seacreature', name)
+        sc = get_critter('sea_creatures', name)
+        if sc is None:
+            raise Exception('NoSeaCreatureFound', name)
+
+        has_quote = sc['catchquote'] is not None
+        display_name = f"{sc['name']} - *{sc['catchquote']}*" if has_quote else sc['name']
+
+        message = f"""
+{display_name}
+Selling price: {sc['nook_price']}
+Shadow size: {sc['shadow_size']}
+Shadow movement: {sc['shadow_movement']}
+Active hours: {sc['active_hours']}
+Active months (northern): {'All year' if len(sc['months_available']['northern']) == 12 else ', '.join(sc['months_available']['northern'])}
+Active months (southern): {'All year' if len(sc['months_available']['southern']) == 12 else ', '.join(sc['months_available']['southern'])}
+Total catches required to spawn: {sc['total_catches']}
+More details at {sc['details_link']}"""
+        await ctx.send(message)
+
+    @seacreature.error
+    async def seacreature_error(self, ctx:discord.ext.commands.Context, error:discord.ext.commands.errors.DiscordException):
+        """Handles errors for the 'seacreature' method. Sends out an informing message to the relevant discord channel.
+
+        :type ctx: discord.ext.commands.Context
+        :type error: discord.ext.commands.errors.DiscordException
+        """
+        if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
+            await ctx.send('Uh oh! It seems you forgot to enter the name of the sea creature you are looking for hoo')
+        
+        elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
+            if error.original.args[0] == 'NoSeaCreatureFound':
+                await ctx.send(f"I'm afraid I was unable to find a sea creature with that name. Are you sure you spelled its name correctly?")
 
         else:
             await ctx.send(self.default_error_msg)
@@ -128,22 +177,22 @@ More details at {bug['details_link']}"""
             raise hemisphere
         critters = get_monthly_critters(critter_type, hemisphere, -2)
         
-        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e = discord.Embed(title=f"{critter_type.capitalize()} in {critters['this_month']} on the {hemisphere} hemisphere", colour=0xF9D048)
         e.add_field(
-            name=f'{critter_type.capitalize()} that were active since {critters["prev_month"]}', 
-            value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
+            name=f'{critter_type.capitalize()} that were around since {critters["prev_month"]}', 
+            value=critters['recurring_critters'], 
             inline=False
         )
 
         e.add_field(
-            name=f'{critter_type.capitalize()} that were new to {critters["this_month"]}!',
-            value=", ".join([critter['name'] for critter in critters['new_critters']]),
+            name=f'{critter_type.capitalize()} that were new in {critters["this_month"]}!',
+            value=critters['new_critters'],
             inline=False
         )
         
         e.add_field(
-            name=f'{critter_type.capitalize()} that left in {critters["next_month"]}',
-            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            name=f'{critter_type.capitalize()} that have left in {critters["next_month"]}',
+            value=critters['leaving_critters'],
             inline=False
         )
         
@@ -177,26 +226,25 @@ More details at {bug['details_link']}"""
         if isinstance(hemisphere, Exception):
             raise hemisphere
         critters = get_monthly_critters(critter_type, hemisphere)
-        
-        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+
+        e = discord.Embed(title=f"{critter_type.capitalize()} in {critters['this_month']} on the {hemisphere} hemisphere", colour=0xF9D048)
         e.add_field(
             name=f'{critter_type.capitalize()} that have stayed since {critters["prev_month"]}', 
-            value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
+            value=critters['recurring_critters'], 
             inline=False
         )
 
         e.add_field(
-            name=f'{critter_type.capitalize()} that are new for {critters["this_month"]}!',
-            value=", ".join([critter['name'] for critter in critters['new_critters']]),
+            name=f'{critter_type.capitalize()} that are new to {critters["this_month"]}!',
+            value=critters['new_critters'],
             inline=False
         )
 
         e.add_field(
             name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
-            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            value=critters['leaving_critters'],
             inline=False
         )
-
         await ctx.send(embed=e)
     
     @thismonth.error
@@ -228,22 +276,22 @@ More details at {bug['details_link']}"""
             raise hemisphere
         critters = get_monthly_critters(critter_type, hemisphere, 0)
         
-        e = discord.Embed(title=f"{critter_type.capitalize()} for {critters['this_month']} in the {hemisphere} hemisphere", colour=0xF9D048)
+        e = discord.Embed(title=f"{critter_type.capitalize()} in {critters['this_month']} on the {hemisphere} hemisphere", colour=0xF9D048)
         e.add_field(
-            name=f'{critter_type.capitalize()} that will stay after {critters["prev_month"]}', 
-            value=", ".join([critter['name'] for critter in critters['recurring_critters']]), 
+            name=f'{critter_type.capitalize()} that will stay around after {critters["prev_month"]}', 
+            value=critters['recurring_critters'], 
             inline=False
         )
 
         e.add_field(
-            name=f'{critter_type.capitalize()} that will be new for {critters["this_month"]}!',
-            value=", ".join([critter['name'] for critter in critters['new_critters']]),
+            name=f'{critter_type.capitalize()} that will be new in {critters["this_month"]}!',
+            value=critters['new_critters'],
             inline=False
         )
         
         e.add_field(
             name=f'{critter_type.capitalize()} that will be leaving in {critters["next_month"]}',
-            value=', '.join([critter['name'] for critter in critters['leaving_critters']]),
+            value=critters['leaving_critters'],
             inline=False
         )
 
@@ -278,7 +326,7 @@ More details at {bug['details_link']}"""
             await ctx.send(self.default_error_msg)
 
 
-    def _verify_hemisphere(self, guild_id:str, hemisphere:str) -> str:
+    def _verify_hemisphere(self, guild_id:str, hemisphere:str=None) -> str:
         """Verifies the specified hemisphere is valid by looking through the serversettings JSON file.
 
         :type hemisphere: str

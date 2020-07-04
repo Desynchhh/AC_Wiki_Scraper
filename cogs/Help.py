@@ -27,6 +27,7 @@ class Help(commands.Cog):
                 f"{prefix}help [command] - Shows this message. You can also get more detailed help on each command.\n"
                 f"{prefix}fish <name> - Shows information on a specified fish.\n"
                 f"{prefix}bug <name> - Shows information on a specified bug.\n"
+                f"{prefix}seacreature <name> - Shows information on a specified sea creature.\n"
                 f"{prefix}prevmonth <critter type> [hemisphere] - Shows all fish/bugs you could catch last month.\n"
                 f"{prefix}thismonth <critter type> [hemisphere] - Shows all fish/bugs you can catch this month.\n"
                 f"{prefix}nextmonth <critter type> [hemisphere] - Shows all fish/bugs you can catch next month.\n",
@@ -94,6 +95,26 @@ class Help(commands.Cog):
             "**name**: Name of the bug you wish to know about.\n"
             f"**Example**: {prefix}bug common butterfly\n"
             "**Aliases**: bug, b",
+        inline=False)
+        e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=e)
+
+
+    @help.command(aliases=['sc', 'sea_creature'])
+    async def seacreature(self, ctx:discord.ext.commands.Context):
+        """A detailed help command for the seacreature command. Helps users understand the seacreature command.
+
+        :type ctx: discord.ext.commands.Context
+        """
+        await log_command(ctx, 'help', 'seacreature')
+        prefix = Serversettings().get_prefix(ctx.guild.id)
+        e = discord.Embed(title=f'**{prefix}seacreature <name>**', colour=self.embed_colour)
+        e.add_field(name='Shows information on a specified sea creature.', value=
+            "You need to type the seacreature's name **exactly** how it's spelled in the game for the command to work (case insensitive).\n"
+            "Sadly, not all the seacreatures' catch quotes are available on the wiki, but most of them are!\n"
+            "**name**: Name of the seacreature you wish to know about.\n"
+            f"**Example**: {prefix}seacreature sea star\n"
+            "**Aliases**: sc, sea_creature",
         inline=False)
         e.set_footer(text=f'Requested by {ctx.author.name}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
