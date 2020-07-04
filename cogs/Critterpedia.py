@@ -121,7 +121,7 @@ More details at {bug['details_link']}"""
         :raises Exception: NoSeaCreatureFound. The method could not find the specified sea creature in the JSON file.
         """
         await log_command(ctx, 'seacreature', name)
-        sc = get_critter('sea_creatures', name)
+        sc = get_critter('seacreatures', name)
         if sc is None:
             raise Exception('NoSeaCreatureFound', name)
 
