@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
-import requests, json, os
-#asyncio
+import requests, json, os, re, time
 
 base_url = "https://nookipedia.com"
 months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
@@ -36,29 +35,24 @@ async def scrape_fish():
         #     pass
         
         if curr_col == 3:   # Price
-            price = int(fish.text.strip().replace(',',''))
+            raw_price = fish.text.strip()
+            price = int(re.sub(r'\D', '', raw_price))
             fishes[curr_fish]['nook_price'] = price
             fishes[curr_fish]['cj_price'] = int(price*1.5)
         
         if curr_col == 4:   # Shadow
-            shadow = fish.text.strip()
+            shadow = fish.img['alt']
             fishes[curr_fish]['shadow_size'] = shadow
         
-        # if curr_col == 5:   # Size
-        #     pass
-        
-        # if curr_col == 6:   # Tank
-        #     pass
-        
-        if curr_col == 7:   # Location
+        if curr_col == 5:   # Location
             location = fish.a.text.strip()
             fishes[curr_fish]['location'] = location
         
-        if curr_col == 8:   # Time
+        if curr_col == 6:   # Time
             active_hours = fish.text.strip()
             fishes[curr_fish]['active_hours'] = active_hours
         
-        if curr_col == 9:   # Months
+        if curr_col == 7:   # Months
             fishes[curr_fish]['months_available'] = {'northern': [], 'southern': []}
             fishes[curr_fish]['months_unavailable'] = {'northern': [], 'southern': []}
             n, s = await handle_months(fish)
@@ -73,11 +67,8 @@ async def scrape_fish():
                     fishes[curr_fish]['months_available']['southern'].append(m)
                 else:
                     fishes[curr_fish]['months_unavailable']['southern'].append(m)
-
-        # if curr_col == 10:   # Peak
-        #     pass
         
-        # if i >= 11:  # Done with 1st fish (Used for testing purposes)
+        # if i >= 8:  # Done with 1st fish (Used for testing purposes)
         #     break
 
     with open(os.path.join('json', 'fish.json'), 'w') as f:
@@ -182,7 +173,7 @@ async def handle_months(critter):
     return (n_month_availability, s_month_availability)
 
 
-async def scrape_quote(critter_name:str, details_link:str):
+async def scrape_quote_deprecated(critter_name:str, details_link:str):
     source = requests.get(details_link).text
     soup = BeautifulSoup(source, 'lxml')
     try:
@@ -192,8 +183,38 @@ async def scrape_quote(critter_name:str, details_link:str):
         return 'The catch quote for this critter is not yet available on the wiki. Sorry.'
 
 
-async def run_scraper():
-    await scrape_fish()
-    await scrape_bugs()
+async def scrape_quote(critter_name:str, details_link:str):
+    source = requests.get(details_link).text
+    soup = BeautifulSoup(source, 'lxml')
+    try:
+        nh_h3 = soup.find('span', id='In_New_Horizons').parent
+        nh_div = nh_h3.find_next('div')
+        raw_quote = nh_div.p.text.strip()
+        quote = raw_quote[1:-1]
+        return quote if quote != "" else None
+    except:
+        return None
 
-# asyncio.run(run_scraper())
+
+
+async def run_scraper():
+    if not os.path.exists('json'):
+        os.mkdir('json')
+    t0 = time.perf_counter()
+    print('Running "scrape_fish"...')
+    await scrape_fish()
+    print('Done!')
+    t1 = time.perf_counter()
+    print('Time taken:', t1-t0, 'seconds')
+
+    print('Running "scrape_bugs"...')
+    await scrape_bugs()
+    print('Done!')
+    t2 = time.perf_counter()
+    print('Time taken:', t2-t1, 'seconds.')
+
+    print('Total time taken:', t2-t0, 'seconds')
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(run_scraper())

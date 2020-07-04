@@ -28,7 +28,7 @@ class Critterpedia(commands.Cog):
         if fish is None:
             raise Exception('NoFishFound', name)
 
-        has_quote = fish['catchquote'] != 'The catch quote for this critter is not yet available on the wiki. Sorry.'
+        has_quote = fish['catchquote'] is not None
         display_name = f"{fish['name']} - *{fish['catchquote']}*" if has_quote else fish['name']
 
         message = f"""
@@ -76,7 +76,7 @@ More details at {fish['details_link']}"""
         if bug is None:
             raise Exception('NoBugFound', name)
 
-        has_quote = bug['name'].lower() in bug['catchquote'].lower()
+        has_quote = bug['catchquote'] is not None
         display_name = f"{bug['name']} - *{bug['catchquote']}*" if has_quote else bug['name']
 
         message = f"""

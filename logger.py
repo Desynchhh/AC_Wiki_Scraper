@@ -11,6 +11,7 @@ async def make_log_dir(guild_log_dir:str):
 
 
 async def log_command(ctx, command=str, *args):
+    return
     dir_path = os.path.join(log_dir, str(ctx.guild.id))
     guild_name = re.sub(r'[\W]', '', ctx.guild.name)
     file_path = os.path.join(dir_path, f'COMMANDS_{guild_name}.txt')
@@ -19,6 +20,7 @@ async def log_command(ctx, command=str, *args):
 
 
 async def log_error(ctx, error):
+    return
     dir_path = os.path.join(log_dir, str(ctx.guild.id))
     guild_name = re.sub(r'[\W]', '', ctx.guild.name)
     file_path = os.path.join(dir_path, f'ERRORS_{guild_name}.txt')
@@ -27,6 +29,7 @@ async def log_error(ctx, error):
 
 
 async def log(dir_path, file_path, msg):
+    return
     make_log_dir(dir_path)
     mode = 'a' if os.path.exists(file_path) else 'w'
     with open(file_path, mode) as f:
