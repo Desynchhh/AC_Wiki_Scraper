@@ -60,16 +60,16 @@ def scrape_fish():
             fishes[curr_fish]['months_unavailable'] = {'northern': [], 'southern': []}
             n, s = handle_months(fish)
             
-            for k, m in enumerate(months):
-                if n[k][1] is True:
-                    fishes[curr_fish]['months_available']['northern'].append(m)
+            for month_number, month in enumerate(months):
+                if n[month_number][1] is True:
+                    fishes[curr_fish]['months_available']['northern'].append(month)
                 else:
-                    fishes[curr_fish]['months_unavailable']['northern'].append(m)
+                    fishes[curr_fish]['months_unavailable']['northern'].append(month)
                 
-                if s[k][1] is True:
-                    fishes[curr_fish]['months_available']['southern'].append(m)
+                if s[month_number][1] is True:
+                    fishes[curr_fish]['months_available']['southern'].append(month)
                 else:
-                    fishes[curr_fish]['months_unavailable']['southern'].append(m)
+                    fishes[curr_fish]['months_unavailable']['southern'].append(month)
             continue
         
         elif curr_col == 8:    # Rarity
@@ -276,8 +276,6 @@ def scrape_sea_creatures():
         json.dump(sea_creatures, f)
 
 
-
-
 def handle_months(critter):
     n_month_availability = []
     s_month_availability = []
@@ -316,7 +314,7 @@ def scrape_quote(details_link:str):
     try:
         nh_h3 = soup.find('span', id='In_New_Horizons').parent
         nh_div = nh_h3.find_next('div')
-        raw_quote = nh_div.p.text.strip()
+        raw_quote = nh_div.p.i.text.strip()
         quote = raw_quote[1:-1]
         return quote if quote != "" else None
     except:
