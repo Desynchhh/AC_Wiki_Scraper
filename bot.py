@@ -41,7 +41,7 @@ bot.remove_command('help')
 async def on_ready():
     """The bot's on_ready event. Starts background tasks as well as notifies the console the bot is ready."""
     # update_critterpedia.start()
-    print('Celeste, ready for action!')
+    print(os.environ['BOT_NAME'], 'ready for action!')
 
 
 @bot.event

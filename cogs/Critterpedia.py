@@ -11,6 +11,10 @@ class Critterpedia(commands.Cog):
         self.bot = bot
         self.default_error_msg = "I am sorry, but something went wrong. I am uncertain whether it was something you did, or something I did hoo.."
         self.valid_critter_types = ['fish', 'bugs', 'seacreatures']
+    
+
+    def get_month_suffix(self, critter:dict, hemisphere:str) -> str:
+        return 'All year' if len(critter['months_available'][hemisphere]) == 12 else ', '.join(critter['months_available'][hemisphere])
 
 
     @commands.command(aliases=['f'])
@@ -28,20 +32,35 @@ class Critterpedia(commands.Cog):
         if fish is None:
             raise Exception('NoFishFound', name)
 
-        has_quote = fish['catchquote'] is not None
-        display_name = f"{fish['name']} - *{fish['catchquote']}*" if has_quote else fish['name']
+        message_parts = []
 
-        message = f"""
-{display_name}
-Selling price: {fish['nook_price']}
-C.J. selling price: {fish['cj_price']}
-Location: {fish['location']}
-Shadow size: {fish['shadow_size']}
-Active hours: {fish['active_hours']}
-Active months (northern): {'All year' if len(fish['months_available']['northern']) == 12 else ', '.join(fish['months_available']['northern'])}
-Active months (southern): {'All year' if len(fish['months_available']['southern']) == 12 else ', '.join(fish['months_available']['southern'])}
-Total catches required to spawn: {fish['total_catches']}
-More details at {fish['details_link']}"""
+        has_quote = fish['catchquote'] is not None
+        message_parts.append(f"{fish['name']} - *{fish['catchquote']}*" if has_quote else fish['name'])
+        
+        message_parts.append(f"Selling price: {fish['nook_price']}")
+        
+        message_parts.append(f"C.J. selling price: {fish['cj_price']}")
+        
+        message_parts.append(f"Location: {fish['location']}")
+        
+        message_parts.append(f"Shadow size: {fish['shadow_size']}")
+
+        message_parts.append(f"Active hours: {fish['active_hours']}")
+        
+        message_parts.append(f"Active months (northern): {self.get_month_suffix(fish, 'northern')}")
+
+        message_parts.append(f"Active months (southern): {self.get_month_suffix(fish, 'southern')}")
+
+        if len(fish['rarity']) > 0:
+            message_parts.append(f"Rarity: {fish['rarity']}")
+
+        if int(fish['total_catches']) > 0:
+            message_parts.append(f"Total catches required to spawn: {fish['total_catches']}")
+            
+        message_parts.append(f"More details at {fish['details_link']}")
+
+        message = '\n'.join(message_parts)
+
         await ctx.send(message)
 
     @fish.error
@@ -56,7 +75,7 @@ More details at {fish['details_link']}"""
         
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'NoFishFound':
-                await ctx.send(f"I am sorry, I was unable to find a fish called {error.original.args[1]}. Are you certain you spelled its name correctly?")
+                await ctx.send(f"I'm afraid I was unable to find a fish with that name. Are you certain you spelled its name correctly?")
 
         else:
             await ctx.send(self.default_error_msg)
@@ -77,19 +96,33 @@ More details at {fish['details_link']}"""
         if bug is None:
             raise Exception('NoBugFound', name)
 
-        has_quote = bug['catchquote'] is not None
-        display_name = f"{bug['name']} - *{bug['catchquote']}*" if has_quote else bug['name']
+        message_parts = []
 
-        message = f"""
-{display_name}
-Selling price: {bug['nook_price']}
-Flick selling price: {bug['flick_price']}
-Location: {bug['location']}
-Rarity: {bug['rarity']}
-Active hours: {bug['active_hours']}
-Active months (northern): {'All year' if len(bug['months_available']['northern']) == 12 else ', '.join(bug['months_available']['northern'])}
-Active months (southern): {'All year' if len(bug['months_available']['southern']) == 12 else ', '.join(bug['months_available']['southern'])}
-More details at {bug['details_link']}"""
+        has_quote = bug['catchquote'] is not None
+        message_parts.append(f"{bug['name']} - *{bug['catchquote']}*" if has_quote else bug['name'])
+
+        message_parts.append(f"Selling price: {bug['nook_price']}")
+
+        message_parts.append(f"Flick selling price: {bug['flick_price']}")
+
+        message_parts.append(f"Location: {bug['location']}")
+        
+        message_parts.append(f"Active hours: {bug['active_hours']}")
+
+        message_parts.append(f"Active months (northern): {self.get_month_suffix(bug, 'northern')}")
+
+        message_parts.append(f"Active months (southern): {self.get_month_suffix(bug, 'southern')}")
+
+        if len(bug['rarity']) > 0:
+            message_parts.append(f"Rarity: {bug['rarity']}")
+
+        if int(bug['total_catches']) > 0:
+            message_parts.append(f"Total catches required to spawn: {bug['total_catches']}")
+
+        message_parts.append(f"More details at {bug['details_link']}")
+
+        message = '\n'.join(message_parts)
+
         await ctx.send(message)
 
     @bug.error
@@ -104,13 +137,13 @@ More details at {bug['details_link']}"""
         
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'NoBugFound':
-                await ctx.send(f"I'm afraid I was unable to find a bug called {error.original.args[1]}. Are you certain you spelled its name correctly?")
+                await ctx.send(f"I'm afraid I was unable to find a bug with that name. Are you certain you spelled its name correctly?")
 
         else:
             await ctx.send(self.default_error_msg)
 
 
-    @commands.command(aliases=['sc', 'sea_creature'])
+    @commands.command(aliases=['sc', 'sea_creature', 'sea creature'])
     async def seacreature(self, ctx:discord.ext.commands.Context, *, name:str):
         """Searches for the specified sea creature in the local JSON files.
         If the sea creature is found, send out a formatted message with its data.
@@ -125,19 +158,30 @@ More details at {bug['details_link']}"""
         if sc is None:
             raise Exception('NoSeaCreatureFound', name)
 
-        has_quote = sc['catchquote'] is not None
-        display_name = f"{sc['name']} - *{sc['catchquote']}*" if has_quote else sc['name']
+        message_parts = []
 
-        message = f"""
-{display_name}
-Selling price: {sc['nook_price']}
-Shadow size: {sc['shadow_size']}
-Shadow movement: {sc['shadow_movement']}
-Active hours: {sc['active_hours']}
-Active months (northern): {'All year' if len(sc['months_available']['northern']) == 12 else ', '.join(sc['months_available']['northern'])}
-Active months (southern): {'All year' if len(sc['months_available']['southern']) == 12 else ', '.join(sc['months_available']['southern'])}
-Total catches required to spawn: {sc['total_catches']}
-More details at {sc['details_link']}"""
+        has_quote = sc['catchquote'] is not None
+        message_parts.append(f"{sc['name']} - *{sc['catchquote']}*" if has_quote else sc['name'])
+
+        message_parts.append(f"Selling price: {sc['nook_price']}")
+
+        message_parts.append(f"Shadow size: {sc['shadow_size']}")
+
+        message_parts.append(f"Shadow movement: {sc['shadow_movement']}")
+        
+        message_parts.append(f"Active hours: {sc['active_hours']}")
+        
+        message_parts.append(f"Active months (northern): {self.get_month_suffix(sc, 'northern')}")
+        
+        message_parts.append(f"Active months (southern): {self.get_month_suffix(sc, 'southern')}")
+        
+        if int(sc['total_catches']) > 0:
+            message_parts.append(f"Total catches required to spawn: {sc['total_catches']}")
+        
+        message_parts.append(f"More details at {sc['details_link']}")
+
+        message = "\n".join(message_parts)
+
         await ctx.send(message)
 
     @seacreature.error
@@ -314,14 +358,14 @@ More details at {sc['details_link']}"""
         :type error: discord.ext.commands.errors.DiscordException
         """
         if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-            await ctx.send('Hoo! You have to tell me whether you want to view bugs or fish for that period!')
+            await ctx.send('Hoo! You have to tell me which type of critter you want to view for that period!')
         
         elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
             if error.original.args[0] == 'WrongCritterType':
-                await ctx.send("I'm afraid I don't know what type of critter you are looking for. I only know about bugs and fish hoo..")
+                await ctx.send(f"I'm afraid I don't know what type of critter you are looking for. I only know about {','.join(self.valid_critter_types)} hoo..")
 
             elif error.original.args[0] == 'HemisphereDoesNotExist':
-                await ctx.send(f"I'm afraid {error.original.args[1]} is not an existing hemisphere. You can only choose between northern and southern.")
+                await ctx.send(f"I'm afraid that is not a real hemisphere. You can only choose between northern and southern.")
         else:
             await ctx.send(self.default_error_msg)
 

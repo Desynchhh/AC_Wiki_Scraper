@@ -14,4 +14,4 @@ def is_owner(ctx:discord.ext.commands.Context) -> bool:
     :type ctx: discord.ext.commands.Context
     :rtype: bool
     """
-    return ctx.author.id is ctx.guild.owner.id
+    return ctx.message.author.id == ctx.message.guild.owner_id
